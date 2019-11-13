@@ -318,6 +318,87 @@ namespace DBPopulator
 
             };
 
+            List<string> utahCities = new List<string>()
+            {
+                "Farr West",
+                "Harrisville",
+                "Huntsville",
+                "Hooper",
+                "Marriott-Slaterville",
+                "North Ogden",
+                "Ogden",
+                "Plain City",
+                "Pleasant View",
+                "Riverdale",
+                "Roy",
+                "South Ogden",
+                "Uintah",
+                "Washington Terrace",
+                "West Haven",
+                "Eden",
+                "Liberty",
+                "Nordic Valley",
+                "Reese",
+                "Taylor",
+                "Warren",
+                "West Weber",
+                "Bountiful",
+                "Centerville",
+                "Clearfield",
+                "Clinton",
+                "Farmington",
+                "Fruit Heights",
+                "Kaysville",
+                "Layton",
+                "North Salt Lake",
+                "South Weber",
+                "Sunset",
+                "Syracuse",
+                "West Bountiful",
+                "West Point",
+                "Woods Cross",
+                "Harrisville",
+                "Brigham City",
+                "Tremonton",
+                "Mantua",
+                "Honeyville",
+                "Bear River City",
+                "Willard",
+                "Garland",
+                "Deweyville",
+                "Snowville",
+                "Corinne",
+                "Perry",
+                "Fielding",
+                "Plymouth",
+                "Portage",
+                "Howell",
+                "Riverside",
+                "Elwood",
+                "Thatcher",
+                "South Willard",
+                "Kelton",
+                "Salt Lake City",
+                "Sandy",
+                "West Valley City",
+                "West Jordan",
+                "South Jordan",
+                "Murray",
+                "Midvale",
+                "Taylorsville",
+                "Riverton",
+                "South Salt Lake",
+                "Millcreek",
+                "Cottonwood Heights",
+                "Holladay",
+                "Herriman",
+                "Magna",
+                "Kearns",
+                "Alta",
+                "White City",
+                "Granite",
+            };
+
             LMSEntities context = new LMSEntities();
 
             Random rng = new Random();
@@ -426,6 +507,31 @@ namespace DBPopulator
                     Address = rng.Next(5000) + streetPreDirection + (rng.Next(500) * 10) + streetPostDirection,
                     Zip = 80000 + rng.Next(5000),
                 });
+            }
+
+            // Add Zip information
+            List<int?> zipNumbers = context.Instructors.Select(a => a.Zip).Concat(context.Students.Select(b => b.Zip)).ToList();
+            zipNumbers = zipNumbers.Where(a => a != null).ToList();
+            foreach(int? zipNumber in zipNumbers)
+            {
+                context.Zipcodes.Add(new Zipcode()
+                {
+                    city = utahCities.ElementAt(rng.Next(utahCities.Count)),
+                    state = "Utah",
+                    zip = (int)zipNumber,
+                    Instructors = context.Instructors.Where(a => a.Zip == zipNumber).ToList(),
+                    Students = context.Students.Where(a => a.Zip == zipNumber).ToList()
+                });
+            };
+
+            // Associate student/instructor zips back to Zip objects
+            foreach(Student student in context.Students)
+            {
+                student.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == student.Zip);
+            }
+            foreach (Instructor instructor in context.Instructors)
+            {
+                instructor.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == instructor.Zip);
             }
         }
     }

@@ -535,6 +535,8 @@ namespace DBPopulator
             }
 
             //ADD COURSES
+
+            //Possible Course Subjects
             List<string> CourseSubjects = new List<string>()
             {
                 "MATH",
@@ -550,6 +552,7 @@ namespace DBPopulator
                 "ACTG",
             };
 
+            //Corresponding Course Title Words
             List<List<string>> TitleWords = new List<List<string>>();
             TitleWords.Add(new List<string> { "Algebra", "Calculus", "Differential Equation" });
             TitleWords.Add(new List<string> { "Writing", "Reading", "Literature Classics" });
@@ -563,6 +566,7 @@ namespace DBPopulator
             TitleWords.Add(new List<string> { "Sociology", "Social Problem", "Criminology" });
             TitleWords.Add(new List<string> { "Accounting", "Taxation", "Auditing" });
 
+            //Possible Descriptor words for the titles
             List<string> TitleDescriptors = new List<string>()
             {
                 "Methods",
@@ -577,10 +581,16 @@ namespace DBPopulator
                 ", History of"
             };
 
+            //create 10 courses
             for(int i = 0; i < 10; ++i)
             {
+                //get the course number for the course 1050, 1670, etc.
                 int Num = rng.Next(100, 500) * 10;
+
+                //get the subject of the course
                 int SubjectNum = rng.Next(0, CourseSubjects.Count);
+
+                //assign course prefix based on course number generated
                 string CoursePrefix;
                 if( Num >= 1000 && Num< 2000)
                 {
@@ -594,9 +604,12 @@ namespace DBPopulator
                 {
                     CoursePrefix = "Advanced";
                 }
+
+                //Generate Course Num and Title
                 string CourseNo = CourseSubjects[SubjectNum] + " " + Num.ToString();
                 string CourseTitle = CoursePrefix + " " + TitleWords[SubjectNum][rng.Next(0, TitleWords[SubjectNum].Count)] + " " + TitleDescriptors[rng.Next(0, TitleDescriptors.Count)];
 
+                //Check for conflicts and adjust if necessary
                 while(context.Courses.Select(x => x.CourseNo).Contains(CourseNo))
                 {
                     CourseNo = CourseSubjects[SubjectNum] + " " + (Num + rng.Next(0, 10)).ToString();
@@ -606,11 +619,102 @@ namespace DBPopulator
                     CourseTitle = CoursePrefix + " " + TitleWords[SubjectNum][rng.Next(0, TitleWords[SubjectNum].Count)] + " " + TitleDescriptors[rng.Next(0, TitleDescriptors.Count)];
                 }
 
+                //Add the course and save changes
                 context.Courses.Add(new Course()
                 {
                     CourseID = CourseNo,
                     CourseName = CourseTitle  
                 });
+
+                context.Courses.SaveChanges();
+            }
+
+            
+
+            //ADD Sections
+            var queryCourses = context.Courses.Select(x => x.Course_No);
+            List<string> queryCourseList = queryCourses.toList();
+
+            //add sections for each course
+            foreach (string Course_No in queryCourseList)
+            {
+                //add a number of sections between 1 and 3
+                for(int i = 0; i < rng.Next(1,4); ++i)
+                {
+                    //get SectionID
+                    int SectID = rng.Next(0, 10000);
+
+                    //get current dates for date calculations
+                    int Month = DateTime.Now.Month;
+                    int Year = DateTime.Now.Year;
+                    DateTime BDate;
+                    DateTime EDate;
+
+                    //Summer Registration
+                    if(Month >= 1 && Month < 5)
+                    {
+                        //add term identifier and set dates
+                        SectID += 10000;
+                        //check for conflicts
+                        while(context.Sections.Any(x => x.SectionID == SectID))
+                        {
+                            SectID = rng.Next(0, 10000) + 10000;
+                        }
+                        BDate = new DateTime(Year, 5, 1);
+                        EDate = new DateTime(Year, 8, 31);
+                    }
+                    //Fall Registration
+                    else if(Month >=5 && Month < 9)
+                    {
+                        //add term identifier and set dates
+                        SectID += 20000;
+                        //check for conflicts
+                        while (context.Sections.Any(x => x.SectionID == SectID))
+                        {
+                            SectID = rng.Next(0, 10000) + 20000;
+                        }
+                        BDate = new DateTime(Year, 9, 1);
+                        EDate = new DateTime(Year, 12, 31);
+                    }
+                    //Spring Registration
+                    else
+                    {
+                        //add term identifier and set dates
+                        SectID += 30000;
+                        //check for conflicts
+                        while (context.Sections.Any(x => x.SectionID == SectID))
+                        {
+                            SectID = rng.Next(0, 10000) + 30000;
+                        }
+                        BDate = new DateTime(Year + 1, 1, 1);
+                        EDate = new DateTime(Year + 1, 4, 30);
+                    }
+
+                    //Get a list of instructors who aren't already teaching 4 sections
+                    var InstructorIDs = context.Instructors.GroupBy(x => x.InstructorID).Where(grp => grp.Count() < 4).Select(grp => grp.Key);
+                    List<int> InstIDs = InstructorIDs.ToList();
+
+                    //if there are no available professors, don't add another section
+                    if(InstIDs.Count == 0)
+                    {
+                        break;
+                    }
+
+                    int InstID = InstIDs[rng.Next(0, InstIDs.Count)];
+
+                    //add section and save change
+                    context.Sections.Add(new Section()
+                    {
+                        SectionID = SectID,
+                        CourseID = Course_No,
+                        InstructorID = InstID,
+                        BeginDate = BDate,
+                        EndDate = EDate,
+                        HTMLPath = null
+                    });
+
+                    context.Sections.SaveChanges();
+                }
             }
         }
     }

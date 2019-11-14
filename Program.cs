@@ -533,6 +533,85 @@ namespace DBPopulator
             {
                 instructor.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == instructor.Zip);
             }
+
+            //ADD COURSES
+            List<string> CourseSubjects = new List<string>()
+            {
+                "MATH",
+                "ENGL",
+                "CS",
+                "GEOG",
+                "GEO",
+                "SPAN",
+                "ENGR",
+                "QUAN",
+                "BSAD",
+                "SOC",
+                "ACTG",
+            };
+
+            List<List<string>> TitleWords = new List<List<string>>();
+            TitleWords.Add(new List<string> { "Algebra", "Calculus", "Differential Equation" });
+            TitleWords.Add(new List<string> { "Writing", "Reading", "Literature Classics" });
+            TitleWords.Add(new List<string> { "Java", "C#", "Algorithm" });
+            TitleWords.Add(new List<string> { "Regional", "Weather and Climate", "Geography" });
+            TitleWords.Add(new List<string> { "Earth Study", "Mineral", "Soil" });
+            TitleWords.Add(new List<string> { "Grammar", "Literature", "Translation" });
+            TitleWords.Add(new List<string> { "Mechanical", "Static", "Dynamic" });
+            TitleWords.Add(new List<string> { "Statistics", "Business Calculus", "Probability" });
+            TitleWords.Add(new List<string> { "Management", "Leadership", "Business Modeling" });
+            TitleWords.Add(new List<string> { "Sociology", "Social Problem", "Criminology" });
+            TitleWords.Add(new List<string> { "Accounting", "Taxation", "Auditing" });
+
+            List<string> TitleDescriptors = new List<string>()
+            {
+                "Methods",
+                "Analysis",
+                "Theory",
+                "I",
+                "II",
+                "III",
+                "Studies",
+                "Research",
+                "Development",
+                ", History of"
+            };
+
+            for(int i = 0; i < 10; ++i)
+            {
+                int Num = rng.Next(100, 500) * 10;
+                int SubjectNum = rng.Next(0, CourseSubjects.Count);
+                string CoursePrefix;
+                if( Num >= 1000 && Num< 2000)
+                {
+                    CoursePrefix = "Beginning";
+                }
+                else if(Num >= 2000 && Num < 3000)
+                {
+                    CoursePrefix = "Intermediate";
+                }
+                else
+                {
+                    CoursePrefix = "Advanced";
+                }
+                string CourseNo = CourseSubjects[SubjectNum] + " " + Num.ToString();
+                string CourseTitle = CoursePrefix + " " + TitleWords[SubjectNum][rng.Next(0, TitleWords[SubjectNum].Count)] + " " + TitleDescriptors[rng.Next(0, TitleDescriptors.Count)];
+
+                while(context.Courses.Select(x => x.CourseNo).Contains(CourseNo))
+                {
+                    CourseNo = CourseSubjects[SubjectNum] + " " + (Num + rng.Next(0, 10)).ToString();
+                }
+                while(context.Courses.Select(x => x.CourseName).Contains(CourseTitle))
+                {
+                    CourseTitle = CoursePrefix + " " + TitleWords[SubjectNum][rng.Next(0, TitleWords[SubjectNum].Count)] + " " + TitleDescriptors[rng.Next(0, TitleDescriptors.Count)];
+                }
+
+                context.Courses.Add(new Course()
+                {
+                    CourseID = CourseNo,
+                    CourseName = CourseTitle  
+                });
+            }
         }
     }
 }

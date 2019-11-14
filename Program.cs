@@ -534,7 +534,7 @@ namespace DBPopulator
                 instructor.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == instructor.Zip);
             }
 
-            //ADD COURSES
+            //ADD COURSES-----------------------------------
 
             //Possible Course Subjects
             List<string> CourseSubjects = new List<string>()
@@ -610,7 +610,7 @@ namespace DBPopulator
                 string CourseTitle = CoursePrefix + " " + TitleWords[SubjectNum][rng.Next(0, TitleWords[SubjectNum].Count)] + " " + TitleDescriptors[rng.Next(0, TitleDescriptors.Count)];
 
                 //Check for conflicts and adjust if necessary
-                while(context.Courses.Select(x => x.CourseNo).Contains(CourseNo))
+                while(context.Courses.Select(x => x.CourseID).Contains(CourseNo))
                 {
                     CourseNo = CourseSubjects[SubjectNum] + " " + (Num + rng.Next(0, 10)).ToString();
                 }
@@ -626,14 +626,14 @@ namespace DBPopulator
                     CourseName = CourseTitle  
                 });
 
-                context.Courses.SaveChanges();
+                context.SaveChanges();
             }
 
-            
 
-            //ADD Sections
-            var queryCourses = context.Courses.Select(x => x.Course_No);
-            List<string> queryCourseList = queryCourses.toList();
+
+            //ADD Sections-----------------------------------
+            var queryCourses = context.Courses.Select(x => x.CourseID);
+            List<string> queryCourseList = queryCourses.ToList();
 
             //add sections for each course
             foreach (string Course_No in queryCourseList)
@@ -713,7 +713,51 @@ namespace DBPopulator
                         HTMLPath = null
                     });
 
-                    context.Sections.SaveChanges();
+                    context.SaveChanges();
+                }
+            }
+
+            //ADD STUDENT ENROLLMENTS TO EACH SECTION
+            //get a list of the sections
+            var querySections = context.Sections.Select(x => x.SectionID);
+            List<int> querySectionList = querySections.ToList();
+
+            //get a list of student IDs
+            var possibleStudents = context.Students.Select(x => x.StudentID);
+            List<int> possibleStudentIDs = possibleStudents.ToList();
+
+            //for each section add between 15,25 students
+            foreach (int SectID in querySectionList)
+            {
+                for(int i = 0; i < rng.Next(15,26); ++i)
+                {
+                    int StudID = possibleStudentIDs[rng.Next(0, possibleStudentIDs.Count)];
+
+                    //Set the enrollment term 201710, 201720, 201730 etc.
+                    string Enroll;
+                    if(SectID < 20000)
+                    {
+                        Enroll = (DateTime.Now.Year + 1).ToString() + "10";
+                    }
+                    else if(SectID < 30000)
+                    {
+                        Enroll = (DateTime.Now.Year + 1).ToString() + "20";
+                    }
+                    else
+                    {
+                        Enroll = (DateTime.Now.Year + 1).ToString() + "30";
+                    }
+
+                    //add the enrollment and save changes
+                    context.Enrollments.Add(new Enrollment()
+                    {
+                        StudentID = StudID,
+                        SectionID = SectID,
+                        EnrollmentTerm = Enroll,
+                        LetterGrade = "IP"
+                    });
+
+                    context.SaveChanges();
                 }
             }
         }

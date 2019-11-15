@@ -962,13 +962,14 @@ namespace DBPopulator
                 }
             }
 
-            // Add instructor details to sections
-            foreach(var section in context.Sections)
-            {
-                section.Instructor = context.Instructors.Where(a => a.Sections.Count < 4).ElementAt(rng.Next(context.Instructors.Where(a => a.Sections.Count < 4).Count()));
-                section.InstructorID = section.Instructor.InstructorID;
-                section.Instructor.Sections.Add(section);
-            }
+            // Commented out:  this may have already been done
+            //// Add instructor details to sections
+            //foreach(var section in context.Sections)
+            //{
+            //    section.Instructor = context.Instructors.Where(a => a.Sections.Count < 4).ElementAt(rng.Next(context.Instructors.Where(a => a.Sections.Count < 4).Count()));
+            //    section.InstructorID = section.Instructor.InstructorID;
+            //    section.Instructor.Sections.Add(section);
+            //}
 
             // Add random assignments to sections
             for(int i = 0; i < context.Sections.Count() * 7; i++)

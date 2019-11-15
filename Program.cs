@@ -410,10 +410,16 @@ namespace DBPopulator
             {
                 string firstName = commonFirstNames.ElementAt(rng.Next(commonFirstNames.Count));
                 string lastName = commonLastNames.ElementAt(rng.Next(commonLastNames.Count));
-                bool emailConflict = context.Students.Select(a => a.Email).Contains(firstName + '.' + lastName + "@mail.weber.edu");
-                string lastConflictingEmail = context.Students.Select(a => a.Email).Where(a => a.Contains(firstName + '.' + lastName + "@mail.weber.edu")).Last();
-                int numericAdditive = int.TryParse(lastConflictingEmail?.Substring(lastConflictingEmail.LastIndexOf(lastName) + lastName.Length, lastConflictingEmail.IndexOf('@') - lastConflictingEmail.LastIndexOf(lastName) + lastName.Length), out int tempConflictEmail) ? tempConflictEmail : 0;
-                numericAdditive++;
+                string email = firstName + "." + lastName + "@mail.weber.edu";
+                int StudentID = 0;//TEST IDs
+                //bool emailConflict = context.Students.Select(a => a.Email).Contains(firstName + '.' + lastName + "@mail.weber.edu");
+                //string lastConflictingEmail = context.Students.Select(a => a.Email).Where(a => a.Contains(firstName + '.' + lastName + "@mail.weber.edu")).Last();
+                int numericAdditive = 0;//int.TryParse(lastConflictingEmail?.Substring(lastConflictingEmail.LastIndexOf(lastName) + lastName.Length, lastConflictingEmail.IndexOf('@') - lastConflictingEmail.LastIndexOf(lastName) + lastName.Length), out int tempConflictEmail) ? tempConflictEmail : 0;
+                while(context.Students.Select(a => a.Email).Contains(email))
+                {
+                    email = firstName + "." + lastName + (++numericAdditive).ToString() + "@mail.weber.edu";
+                }               
+                
                 string streetPreDirection = "";
                 string streetPostDirection = "";
                 switch (rng.Next(4))
@@ -450,11 +456,12 @@ namespace DBPopulator
                 {
                     FirstName = firstName,
                     LastName = lastName,
-                    Email = (emailConflict ? (firstName + '.' + lastName + numericAdditive + "@mail.weber.edu") : (firstName + '.' + lastName + "@mail.weber.edu")),
-                    StudentID = context.Students.OrderBy(a => a.StudentID).LastOrDefault() != null ? context.Students.OrderBy(a => a.StudentID).Last().StudentID + 1 : 1,
+                    Email = email,//(emailConflict ? (firstName + '.' + lastName + numericAdditive + "@mail.weber.edu") : (firstName + '.' + lastName + "@mail.weber.edu")),
+                    StudentID = ++StudentID,//context.Students.OrderBy(a => a.StudentID).LastOrDefault() != null ? context.Students.OrderBy(a => a.StudentID).Last().StudentID + 1 : 1,
                     Address = rng.Next(5000) + streetPreDirection + (rng.Next(500) * 10) + streetPostDirection,
                     Zip = 80000 + rng.Next(5000)
                 });
+                context.SaveChanges();
 
 
             }
@@ -464,10 +471,14 @@ namespace DBPopulator
             {
                 string firstName = commonFirstNames.ElementAt(rng.Next(commonFirstNames.Count));
                 string lastName = commonLastNames.ElementAt(rng.Next(commonLastNames.Count));
-                bool emailConflict = context.Instructors.Select(a => a.Email).Contains(firstName + '.' + lastName + "@weber.edu");
-                string lastConflictingEmail = context.Instructors.Select(a => a.Email).Where(a => a.Contains(firstName + '.' + lastName + "@weber.edu")).Last();
-                int numericAdditive = int.TryParse(lastConflictingEmail?.Substring(lastConflictingEmail.LastIndexOf(lastName) + lastName.Length, lastConflictingEmail.IndexOf('@') - lastConflictingEmail.LastIndexOf(lastName) + lastName.Length), out int tempConflictEmail) ? tempConflictEmail : 0;
-                numericAdditive++;
+                string email = firstName + "." + lastName + "@weber.edu";
+                //bool emailConflict = context.Instructors.Select(a => a.Email).Contains(firstName + '.' + lastName + "@weber.edu");
+                //string lastConflictingEmail = context.Instructors.Select(a => a.Email).Where(a => a.Contains(firstName + '.' + lastName + "@weber.edu")).Last();
+                int numericAdditive = 0;//int.TryParse(lastConflictingEmail?.Substring(lastConflictingEmail.LastIndexOf(lastName) + lastName.Length, lastConflictingEmail.IndexOf('@') - lastConflictingEmail.LastIndexOf(lastName) + lastName.Length), out int tempConflictEmail) ? tempConflictEmail : 0;
+                while(context.Instructors.Select(a => a.Email).Contains(email))
+                {
+                    email = firstName + "." + lastName + (++numericAdditive).ToString() + "@weber.edu";
+                }
                 string streetPreDirection = "";
                 string streetPostDirection = "";
                 switch (rng.Next(4))
@@ -504,13 +515,15 @@ namespace DBPopulator
                 {
                     FirstName = firstName,
                     LastName = lastName,
-                    Email = (emailConflict ? (firstName + '.' + lastName + numericAdditive + "@weber.edu") : (firstName + '.' + lastName + "@weber.edu")),
+                    Email = email,//(emailConflict ? (firstName + '.' + lastName + numericAdditive + "@weber.edu") : (firstName + '.' + lastName + "@weber.edu")),
                     InstructorID = context.Students.OrderBy(a => a.StudentID).LastOrDefault() != null ? context.Students.OrderBy(a => a.StudentID).Last().StudentID + 1 : 1,
                     Address = rng.Next(5000) + streetPreDirection + (rng.Next(500) * 10) + streetPostDirection,
                     Zip = 80000 + rng.Next(5000),
                 });
+                context.SaveChanges();
             }
 
+            //THIS NEEDS TO BE POPULATED BEFORE INSTRUCTORS AND STUDENTS---------------------------------------------
             // Add Zip information
             List<int?> zipNumbers = context.Instructors.Select(a => a.Zip).Concat(context.Students.Select(b => b.Zip)).ToList();
             zipNumbers = zipNumbers.Where(a => a != null).ToList();
@@ -524,6 +537,7 @@ namespace DBPopulator
                     Instructors = context.Instructors.Where(a => a.Zip == zipNumber).ToList(),
                     Students = context.Students.Where(a => a.Zip == zipNumber).ToList()
                 });
+                context.SaveChanges();
             };
 
             // Associate student/instructor zips back to Zip objects
@@ -535,6 +549,10 @@ namespace DBPopulator
             {
                 instructor.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == instructor.Zip);
             }
+               
+            context.SaveChanges();
+            //THIS NEEDS TO BE POPULATED BEFORE INSTRUCTORS AND STUDENTS---------------------------------------------
+
 
             //ADD COURSES-----------------------------------
 

@@ -398,12 +398,124 @@ namespace DBPopulator
                 "White City",
                 "Granite",
             };
+            List<int> ziplist = new List<int>()
+            {
+                84404,
+                84414,
+                84001,
+                84978,
+                84632,
+                84752,
+                84002,
+                84003,
+                84444,
+                84037,
+                84054,
+                84065,
+                84012,
+                84013,
+                84014,
+                84066,
+                84091,
+                84071,
+                84053,
+                84041,
+                85264,
+                81254,
+                81234,
+                87415,
+                86495,
+                86321,
+                89715,
+                81111,
+                81112,
+                81113,
+                84232,
+                84233,
+                89662,
+                86248,
+                87754,
+                85234,
+                82913,
+                89426,
+                86315,
+                84368,
+                86258,
+                89156,
+                89465,
+                87495,
+                89456,
+                84651,
+                86515,
+                81532,
+                87325,
+                87211,
+                81236,
+                81225,
+                82156,
+                81645,
+                85241,
+                89745,
+                83455,
+                80019,
+                80143,
+                80156,
+                80652,
+                84068,
+                86110,
+                86111,
+                86112,
+                86113,
+                89126,
+                89129,
+                89185,
+                85136,
+                81439,
+                84911,
+                84922,
+                89751,
+                87367,
+                89513,
+                8557389
 
+            };
             LMSEntities context = new LMSEntities();
 
             const int numberOfStudents = 200, numberofInstructors = 20;
 
             Random rng = new Random();
+            //THIS NEEDS TO BE POPULATED BEFORE INSTRUCTORS AND STUDENTS---------------------------------------------
+            // Add Zip information
+            int zipnumber = ziplist.Count;
+            for (int i = 0; i < zipnumber;)
+            {
+                context.Zipcodes.Add(new Zipcode()
+                {
+                    city = utahCities.ElementAt(i),
+                    state = "Utah",
+                    zip = ziplist.ElementAt(i)
+                });
+                context.SaveChanges();
+                i++;
+            };
+
+ /*
+
+            // Associate student/instructor zips back to Zip objects
+            foreach (Student student in context.Students)
+            {
+                student.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == student.Zip);
+            }
+            foreach (Instructor instructor in context.Instructors)
+            {
+                instructor.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == instructor.Zip);
+            }
+
+            context.SaveChanges();
+            //THIS NEEDS TO BE POPULATED BEFORE INSTRUCTORS AND STUDENTS---------------------------------------------
+
+
+            //ADD COURSES-----------------------------------
 
             // Add students
             for (int i = 0; i < numberOfStudents; i++)
@@ -523,38 +635,7 @@ namespace DBPopulator
                 context.SaveChanges();
             }
 
-            //THIS NEEDS TO BE POPULATED BEFORE INSTRUCTORS AND STUDENTS---------------------------------------------
-            // Add Zip information
-            List<int?> zipNumbers = context.Instructors.Select(a => a.Zip).Concat(context.Students.Select(b => b.Zip)).ToList();
-            zipNumbers = zipNumbers.Where(a => a != null).ToList();
-            foreach (int? zipNumber in zipNumbers)
-            {
-                context.Zipcodes.Add(new Zipcode()
-                {
-                    city = utahCities.ElementAt(rng.Next(utahCities.Count)),
-                    state = "Utah",
-                    zip = (int)zipNumber,
-                    Instructors = context.Instructors.Where(a => a.Zip == zipNumber).ToList(),
-                    Students = context.Students.Where(a => a.Zip == zipNumber).ToList()
-                });
-                context.SaveChanges();
-            };
-
-            // Associate student/instructor zips back to Zip objects
-            foreach (Student student in context.Students)
-            {
-                student.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == student.Zip);
-            }
-            foreach (Instructor instructor in context.Instructors)
-            {
-                instructor.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == instructor.Zip);
-            }
-               
-            context.SaveChanges();
-            //THIS NEEDS TO BE POPULATED BEFORE INSTRUCTORS AND STUDENTS---------------------------------------------
-
-
-            //ADD COURSES-----------------------------------
+*/
 
             //Possible Course Subjects
             List<string> CourseSubjects = new List<string>()

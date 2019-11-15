@@ -629,8 +629,6 @@ namespace DBPopulator
                 context.SaveChanges();
             }
 
-
-
             //ADD Sections-----------------------------------
             var queryCourses = context.Courses.Select(x => x.CourseID);
             List<string> queryCourseList = queryCourses.ToList();
@@ -717,7 +715,7 @@ namespace DBPopulator
                 }
             }
 
-            //ADD STUDENT ENROLLMENTS TO EACH SECTION
+            //ADD STUDENT ENROLLMENTS TO EACH SECTION-----------------------------------
             //get a list of the sections
             var querySections = context.Sections.Select(x => x.SectionID);
             List<int> querySectionList = querySections.ToList();
@@ -760,6 +758,41 @@ namespace DBPopulator
                     context.SaveChanges();
                 }
             }
+
+            //ADD BASIC ASSIGNMENT TYPES
+            int id = 0;
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Assignments"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Quizzes"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Discussions"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Exams"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Misc"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Extra Credit"
+            });
+
+            context.SaveChanges();
         }
     }
 }

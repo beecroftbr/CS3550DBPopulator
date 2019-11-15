@@ -764,6 +764,11 @@ namespace DBPopulator
             context.AssignmentTypes.Add(new AssignmentType()
             {
                 AssignmentTypeID = ++id,
+                Description = "Exams"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
                 Description = "Assignments"
             });
             context.AssignmentTypes.Add(new AssignmentType()
@@ -779,11 +784,6 @@ namespace DBPopulator
             context.AssignmentTypes.Add(new AssignmentType()
             {
                 AssignmentTypeID = ++id,
-                Description = "Exams"
-            });
-            context.AssignmentTypes.Add(new AssignmentType()
-            {
-                AssignmentTypeID = ++id,
                 Description = "Misc"
             });
             context.AssignmentTypes.Add(new AssignmentType()
@@ -793,6 +793,74 @@ namespace DBPopulator
             });
 
             context.SaveChanges();
+
+            //ADD GRADE TYPE WEIGHTS FOR EACH SECTION
+            foreach (int SectID in querySectionList)
+            {
+                int total = 10;
+                int tempid = 0;
+                float exam = rng.Next(3, 6) / 10;
+                total -= Convert.ToInt32(exam * 10);
+
+                float assign = rng.Next(0, total) / 10;
+                total -= Convert.ToInt32(assign * 10);
+
+                float quiz = rng.Next(0, total) / 10;
+                total -= Convert.ToInt32(quiz * 10);
+
+                float discuss = rng.Next(0, total) / 10;
+                total -= Convert.ToInt32(discuss * 10);
+
+                float misc = total;
+
+                float excred = rng.Next(1, 4) / 100;
+
+                context.GradeWeights.Add(new GradeWeight()
+                {
+                    SectionID = SectID,
+                    AssignmentTypeID = ++tempid,
+                    WeightPercent = exam
+                });
+                context.GradeWeights.Add(new GradeWeight()
+                {
+                    SectionID = SectID,
+                    AssignmentTypeID = ++tempid,
+                    WeightPercent = assign
+                });
+                context.GradeWeights.Add(new GradeWeight()
+                {
+                    SectionID = SectID,
+                    AssignmentTypeID = ++tempid,
+                    WeightPercent = quiz
+                });
+                context.GradeWeights.Add(new GradeWeight()
+                {
+                    SectionID = SectID,
+                    AssignmentTypeID = ++tempid,
+                    WeightPercent = discuss
+                });
+                context.GradeWeights.Add(new GradeWeight()
+                {
+                    SectionID = SectID,
+                    AssignmentTypeID = ++tempid,
+                    WeightPercent = exam
+                });
+                context.GradeWeights.Add(new GradeWeight()
+                {
+                    SectionID = SectID,
+                    AssignmentTypeID = ++tempid,
+                    WeightPercent = misc
+                });
+                context.GradeWeights.Add(new GradeWeight()
+                {
+                    SectionID = SectID,
+                    AssignmentTypeID = ++tempid,
+                    WeightPercent = excred
+                });
+
+                context.SaveChanges();
+
+            }
         }
     }
 }

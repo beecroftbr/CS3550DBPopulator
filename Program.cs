@@ -401,10 +401,12 @@ namespace DBPopulator
 
             LMSEntities context = new LMSEntities();
 
+            const int numberOfStudents = 200, numberofInstructors = 20;
+
             Random rng = new Random();
 
             // Add students
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < numberOfStudents; i++)
             {
                 string firstName = commonFirstNames.ElementAt(rng.Next(commonFirstNames.Count));
                 string lastName = commonLastNames.ElementAt(rng.Next(commonLastNames.Count));
@@ -458,7 +460,7 @@ namespace DBPopulator
             }
             // Add 20 instructors
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < numberofInstructors; i++)
             {
                 string firstName = commonFirstNames.ElementAt(rng.Next(commonFirstNames.Count));
                 string lastName = commonLastNames.ElementAt(rng.Next(commonLastNames.Count));

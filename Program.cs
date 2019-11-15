@@ -512,7 +512,7 @@ namespace DBPopulator
             // Add Zip information
             List<int?> zipNumbers = context.Instructors.Select(a => a.Zip).Concat(context.Students.Select(b => b.Zip)).ToList();
             zipNumbers = zipNumbers.Where(a => a != null).ToList();
-            foreach(int? zipNumber in zipNumbers)
+            foreach (int? zipNumber in zipNumbers)
             {
                 context.Zipcodes.Add(new Zipcode()
                 {
@@ -525,7 +525,7 @@ namespace DBPopulator
             };
 
             // Associate student/instructor zips back to Zip objects
-            foreach(Student student in context.Students)
+            foreach (Student student in context.Students)
             {
                 student.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == student.Zip);
             }
@@ -582,7 +582,7 @@ namespace DBPopulator
             };
 
             //create 10 courses
-            for(int i = 0; i < 10; ++i)
+            for (int i = 0; i < 10; ++i)
             {
                 //get the course number for the course 1050, 1670, etc.
                 int Num = rng.Next(100, 500) * 10;
@@ -592,11 +592,11 @@ namespace DBPopulator
 
                 //assign course prefix based on course number generated
                 string CoursePrefix;
-                if( Num >= 1000 && Num< 2000)
+                if (Num >= 1000 && Num < 2000)
                 {
                     CoursePrefix = "Beginning";
                 }
-                else if(Num >= 2000 && Num < 3000)
+                else if (Num >= 2000 && Num < 3000)
                 {
                     CoursePrefix = "Intermediate";
                 }
@@ -610,11 +610,11 @@ namespace DBPopulator
                 string CourseTitle = CoursePrefix + " " + TitleWords[SubjectNum][rng.Next(0, TitleWords[SubjectNum].Count)] + " " + TitleDescriptors[rng.Next(0, TitleDescriptors.Count)];
 
                 //Check for conflicts and adjust if necessary
-                while(context.Courses.Select(x => x.CourseID).Contains(CourseNo))
+                while (context.Courses.Select(x => x.CourseID).Contains(CourseNo))
                 {
                     CourseNo = CourseSubjects[SubjectNum] + " " + (Num + rng.Next(0, 10)).ToString();
                 }
-                while(context.Courses.Select(x => x.CourseName).Contains(CourseTitle))
+                while (context.Courses.Select(x => x.CourseName).Contains(CourseTitle))
                 {
                     CourseTitle = CoursePrefix + " " + TitleWords[SubjectNum][rng.Next(0, TitleWords[SubjectNum].Count)] + " " + TitleDescriptors[rng.Next(0, TitleDescriptors.Count)];
                 }
@@ -623,7 +623,7 @@ namespace DBPopulator
                 context.Courses.Add(new Course()
                 {
                     CourseID = CourseNo,
-                    CourseName = CourseTitle  
+                    CourseName = CourseTitle
                 });
 
                 context.SaveChanges();
@@ -637,7 +637,7 @@ namespace DBPopulator
             foreach (string Course_No in queryCourseList)
             {
                 //add a number of sections between 1 and 3
-                for(int i = 0; i < rng.Next(1,4); ++i)
+                for (int i = 0; i < rng.Next(1, 4); ++i)
                 {
                     //get SectionID
                     int SectID = rng.Next(0, 10000);
@@ -649,12 +649,12 @@ namespace DBPopulator
                     DateTime EDate;
 
                     //Summer Registration
-                    if(Month >= 1 && Month < 5)
+                    if (Month >= 1 && Month < 5)
                     {
                         //add term identifier and set dates
                         SectID += 10000;
                         //check for conflicts
-                        while(context.Sections.Any(x => x.SectionID == SectID))
+                        while (context.Sections.Any(x => x.SectionID == SectID))
                         {
                             SectID = rng.Next(0, 10000) + 10000;
                         }
@@ -662,7 +662,7 @@ namespace DBPopulator
                         EDate = new DateTime(Year, 8, 31);
                     }
                     //Fall Registration
-                    else if(Month >=5 && Month < 9)
+                    else if (Month >= 5 && Month < 9)
                     {
                         //add term identifier and set dates
                         SectID += 20000;
@@ -693,7 +693,7 @@ namespace DBPopulator
                     List<int> InstIDs = InstructorIDs.ToList();
 
                     //if there are no available professors, don't add another section
-                    if(InstIDs.Count == 0)
+                    if (InstIDs.Count == 0)
                     {
                         break;
                     }
@@ -727,17 +727,17 @@ namespace DBPopulator
             //for each section add between 15,25 students
             foreach (int SectID in querySectionList)
             {
-                for(int i = 0; i < rng.Next(15,26); ++i)
+                for (int i = 0; i < rng.Next(15, 26); ++i)
                 {
                     int StudID = possibleStudentIDs[rng.Next(0, possibleStudentIDs.Count)];
 
                     //Set the enrollment term 201710, 201720, 201730 etc.
                     string Enroll;
-                    if(SectID < 20000)
+                    if (SectID < 20000)
                     {
                         Enroll = (DateTime.Now.Year + 1).ToString() + "10";
                     }
-                    else if(SectID < 30000)
+                    else if (SectID < 30000)
                     {
                         Enroll = (DateTime.Now.Year + 1).ToString() + "20";
                     }
@@ -860,6 +860,104 @@ namespace DBPopulator
 
                 context.SaveChanges();
 
+            }
+
+            //ADD LETTER GRADE SCALE FOR EACH SECTION
+            foreach (int SectID in querySectionList)
+            {
+                List<string> Letters = new List<string>()
+                {
+                    "A",
+                    "A-",
+                    "B+",
+                    "B",
+                    "B",
+                    "B-",
+                    "C+",
+                    "C",
+                    "C-",
+                    "D+",
+                    "D",
+                    "D-",
+                    "E"
+                };
+
+                foreach (string letter in Letters)
+                {
+                    float High;
+                    float Low;
+
+                    if(letter == "A")
+                    {
+                        High = 200.00F;
+                        Low = 94.00F;
+                    }
+                    else if(letter == "A-")
+                    {
+                        High = 93.99F;
+                        Low = 90.00F;
+                    }
+                    else if (letter == "B+")
+                    {
+                        High = 89.99F;
+                        Low = 87.00F;
+                    }
+                    else if (letter == "B")
+                    {
+                        High = 86.99F;
+                        Low = 84.00F;
+                    }
+                    else if (letter == "B-")
+                    {
+                        High = 83.99F;
+                        Low = 80.00F;
+                    }
+                    else if (letter == "C+")
+                    {
+                        High = 79.99F;
+                        Low = 77.00F;
+                    }
+                    else if (letter == "C")
+                    {
+                        High = 76.99F;
+                        Low = 74.00F;
+                    }
+                    else if (letter == "C-")
+                    {
+                        High = 73.99F;
+                        Low = 70.00F;
+                    }
+                    else if (letter == "D+")
+                    {
+                        High = 69.99F;
+                        Low = 67.00F;
+                    }
+                    else if (letter == "D")
+                    {
+                        High = 66.99F;
+                        Low = 64.00F;
+                    }
+                    else if (letter == "D-")
+                    {
+                        High = 63.99F;
+                        Low = 60.00F;
+                    }
+                    else
+                    {
+                        High = 59.99F;
+                        Low = 0.00F;
+                    }
+
+                    context.LetterGradeScales.Add(new LetterGradeScale()
+                    {
+                        SectionID = SectID,
+                        LetterGrade = letter,
+                        GradeHigh = High,
+                        GradeLow = Low
+                    });
+
+                    context.SaveChanges();
+                }
             }
         }
     }

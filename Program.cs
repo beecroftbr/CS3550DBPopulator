@@ -517,33 +517,33 @@ namespace DBPopulator
                 
                 string streetPreDirection = "";
                 string streetPostDirection = "";
-                switch (rng.Next(4))
+                switch (rng.Next(0,4))
                 {
-                    case 1:
+                    case 0:
                         streetPreDirection = "N";
                         break;
-                    case 2:
+                    case 1:
                         streetPreDirection = "S";
                         break;
-                    case 3:
+                    case 2:
                         streetPreDirection = "E";
                         break;
-                    case 4:
+                    case 3:
                         streetPreDirection = "W";
                         break;
                 }
-                switch (rng.Next(4))
+                switch (rng.Next(0,4))
                 {
-                    case 1:
+                    case 0:
                         streetPostDirection = "N";
                         break;
-                    case 2:
+                    case 1:
                         streetPostDirection = "S";
                         break;
-                    case 3:
+                    case 2:
                         streetPostDirection = "E";
                         break;
-                    case 4:
+                    case 3:
                         streetPostDirection = "W";
                         break;
                 }

@@ -399,22 +399,117 @@ namespace DBPopulator
                 "Granite",
             };
 
+             List<int> ziplist = new List<int>()
+            {
+                84404,
+                84414,
+                84001,
+                84978,
+                84632,
+                84752,
+                84002,
+                84003,
+                84444,
+                84037,
+                84054,
+                84065,
+                84012,
+                84013,
+                84014,
+                84066,
+                84091,
+                84071,
+                84053,
+                84041,
+                85264,
+                81254,
+                81234,
+                87415,
+                86495,
+                86321,
+                89715,
+                81111,
+                81112,
+                81113,
+                84232,
+                84233,
+                89662,
+                86248,
+                87754,
+                85234,
+                82913,
+                89426,
+                86315,
+                84368,
+                86258,
+                89156,
+                89465,
+                87495,
+                89456,
+                84651,
+                86515,
+                81532,
+                87325,
+                87211,
+                81236,
+                81225,
+                82156,
+                81645,
+                85241,
+                89745,
+                83455,
+                80019,
+                80143,
+                80156,
+                80652,
+                84068,
+                86110,
+                86111,
+                86112,
+                86113,
+                89126,
+                89129,
+                89185,
+                85136,
+                81439,
+                84911,
+                84922,
+                89751,
+                87367,
+                89513,
+                85573
+
+            };
+
             LMSEntities context = new LMSEntities();
 
             const int numberOfStudents = 200, numberofInstructors = 20;
 
             Random rng = new Random();
+           
+            // Add Zip information------------------------------------------------------------
+            int zipnumber = ziplist.Count;
+            for (int i = 0; i < zipnumber;)
+            {
+                context.Zipcodes.Add(new Zipcode()
+                {
+                    city = utahCities.ElementAt(i),
+                    state = "Utah",
+                    zip = ziplist.ElementAt(i)
+                });
+                context.SaveChanges();
+                i++;
+            };
 
-            // Add students
+            // Add students------------------------------------------------------------
             for (int i = 0; i < numberOfStudents; i++)
             {
                 string firstName = commonFirstNames.ElementAt(rng.Next(commonFirstNames.Count));
                 string lastName = commonLastNames.ElementAt(rng.Next(commonLastNames.Count));
+
+                //generate email based on name, check for conflicts, and add number if true
                 string email = firstName + "." + lastName + "@mail.weber.edu";
-                int StudentID = 0;//TEST IDs
-                //bool emailConflict = context.Students.Select(a => a.Email).Contains(firstName + '.' + lastName + "@mail.weber.edu");
-                //string lastConflictingEmail = context.Students.Select(a => a.Email).Where(a => a.Contains(firstName + '.' + lastName + "@mail.weber.edu")).Last();
-                int numericAdditive = 0;//int.TryParse(lastConflictingEmail?.Substring(lastConflictingEmail.LastIndexOf(lastName) + lastName.Length, lastConflictingEmail.IndexOf('@') - lastConflictingEmail.LastIndexOf(lastName) + lastName.Length), out int tempConflictEmail) ? tempConflictEmail : 0;
+                int numericAdditive = 0;
                 while(context.Students.Select(a => a.Email).Contains(email))
                 {
                     email = firstName + "." + lastName + (++numericAdditive).ToString() + "@mail.weber.edu";
@@ -452,110 +547,79 @@ namespace DBPopulator
                         streetPostDirection = "W";
                         break;
                 }
+
                 context.Students.Add(new Student()
                 {
                     FirstName = firstName,
                     LastName = lastName,
-                    Email = email,//(emailConflict ? (firstName + '.' + lastName + numericAdditive + "@mail.weber.edu") : (firstName + '.' + lastName + "@mail.weber.edu")),
-                    StudentID = ++StudentID,//context.Students.OrderBy(a => a.StudentID).LastOrDefault() != null ? context.Students.OrderBy(a => a.StudentID).Last().StudentID + 1 : 1,
-                    Address = rng.Next(5000) + streetPreDirection + (rng.Next(500) * 10) + streetPostDirection,
-                    Zip = 80000 + rng.Next(5000)
+                    Email = email,
+                    StudentID = i + 1,
+                    Address = rng.Next(5000) + " " + streetPreDirection + " " + (rng.Next(500) * 10) + " " + streetPostDirection,
+                    Zip = ziplist[rng.Next(0,ziplist.Count)]
                 });
                 context.SaveChanges();
-
-
             }
-            // Add 20 instructors
-
+            
+            // Add 20 instructors------------------------------------------------------------
             for (int i = 0; i < numberofInstructors; i++)
             {
                 string firstName = commonFirstNames.ElementAt(rng.Next(commonFirstNames.Count));
                 string lastName = commonLastNames.ElementAt(rng.Next(commonLastNames.Count));
+
+                //generate email, check for conflicts, and add number if true
                 string email = firstName + "." + lastName + "@weber.edu";
-                //bool emailConflict = context.Instructors.Select(a => a.Email).Contains(firstName + '.' + lastName + "@weber.edu");
-                //string lastConflictingEmail = context.Instructors.Select(a => a.Email).Where(a => a.Contains(firstName + '.' + lastName + "@weber.edu")).Last();
-                int numericAdditive = 0;//int.TryParse(lastConflictingEmail?.Substring(lastConflictingEmail.LastIndexOf(lastName) + lastName.Length, lastConflictingEmail.IndexOf('@') - lastConflictingEmail.LastIndexOf(lastName) + lastName.Length), out int tempConflictEmail) ? tempConflictEmail : 0;
+                int numericAdditive = 0;
                 while(context.Instructors.Select(a => a.Email).Contains(email))
                 {
                     email = firstName + "." + lastName + (++numericAdditive).ToString() + "@weber.edu";
                 }
+
                 string streetPreDirection = "";
                 string streetPostDirection = "";
-                switch (rng.Next(4))
+                switch (rng.Next(0,4))
                 {
-                    case 1:
+                    case 0:
                         streetPreDirection = "N";
                         break;
-                    case 2:
+                    case 1:
                         streetPreDirection = "S";
                         break;
-                    case 3:
+                    case 2:
                         streetPreDirection = "E";
                         break;
-                    case 4:
+                    case 3:
                         streetPreDirection = "W";
                         break;
                 }
-                switch (rng.Next(4))
+                switch (rng.Next(0,4))
                 {
-                    case 1:
+                    case 0:
                         streetPostDirection = "N";
                         break;
-                    case 2:
+                    case 1:
                         streetPostDirection = "S";
                         break;
-                    case 3:
+                    case 2:
                         streetPostDirection = "E";
                         break;
-                    case 4:
+                    case 3:
                         streetPostDirection = "W";
                         break;
                 }
+
                 context.Instructors.Add(new Instructor()
                 {
                     FirstName = firstName,
                     LastName = lastName,
-                    Email = email,//(emailConflict ? (firstName + '.' + lastName + numericAdditive + "@weber.edu") : (firstName + '.' + lastName + "@weber.edu")),
-                    InstructorID = context.Students.OrderBy(a => a.StudentID).LastOrDefault() != null ? context.Students.OrderBy(a => a.StudentID).Last().StudentID + 1 : 1,
-                    Address = rng.Next(5000) + streetPreDirection + (rng.Next(500) * 10) + streetPostDirection,
-                    Zip = 80000 + rng.Next(5000),
+                    Email = email,
+                    InstructorID = i + 1,
+                    Address = rng.Next(5000) + " " + streetPreDirection + " " + (rng.Next(500) * 10) + " " + streetPostDirection,
+                    Zip = ziplist[rng.Next(0,ziplist.Count)]
                 });
                 context.SaveChanges();
             }
-
-            //THIS NEEDS TO BE POPULATED BEFORE INSTRUCTORS AND STUDENTS---------------------------------------------
-            // Add Zip information
-            List<int?> zipNumbers = context.Instructors.Select(a => a.Zip).Concat(context.Students.Select(b => b.Zip)).ToList();
-            zipNumbers = zipNumbers.Where(a => a != null).ToList();
-            foreach (int? zipNumber in zipNumbers)
-            {
-                context.Zipcodes.Add(new Zipcode()
-                {
-                    city = utahCities.ElementAt(rng.Next(utahCities.Count)),
-                    state = "Utah",
-                    zip = (int)zipNumber,
-                    Instructors = context.Instructors.Where(a => a.Zip == zipNumber).ToList(),
-                    Students = context.Students.Where(a => a.Zip == zipNumber).ToList()
-                });
-                context.SaveChanges();
-            };
-
-            // Associate student/instructor zips back to Zip objects
-            foreach (Student student in context.Students)
-            {
-                student.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == student.Zip);
-            }
-            foreach (Instructor instructor in context.Instructors)
-            {
-                instructor.Zipcode = context.Zipcodes.FirstOrDefault(a => a.zip == instructor.Zip);
-            }
-               
-            context.SaveChanges();
-            //THIS NEEDS TO BE POPULATED BEFORE INSTRUCTORS AND STUDENTS---------------------------------------------
-
-
-            //ADD COURSES-----------------------------------
-
+            
+            //ADD COURSES----------------------------------
             //Possible Course Subjects
             List<string> CourseSubjects = new List<string>()
             {
@@ -649,6 +713,7 @@ namespace DBPopulator
                 context.SaveChanges();
             }
 
+            
             //ADD Sections-----------------------------------
             var queryCourses = context.Courses.Select(x => x.CourseID);
             List<string> queryCourseList = queryCourses.ToList();
@@ -734,7 +799,7 @@ namespace DBPopulator
                     context.SaveChanges();
                 }
             }
-
+            
             //ADD STUDENT ENROLLMENTS TO EACH SECTION-----------------------------------
             //get a list of the sections
             var querySections = context.Sections.Select(x => x.SectionID);
@@ -743,13 +808,26 @@ namespace DBPopulator
             //get a list of student IDs
             var possibleStudents = context.Students.Select(x => x.StudentID);
             List<int> possibleStudentIDs = possibleStudents.ToList();
-
+            
             //for each section add between 15,25 students
             foreach (int SectID in querySectionList)
             {
+                List<int> usedIDs = new List<int>();
+                //if there are no more possible students, go to next section
+                if(usedIDs.Count == possibleStudentIDs.Count)
+                {
+                    continue;
+                }
                 for (int i = 0; i < rng.Next(15, 26); ++i)
                 {
+                    //check for duplicate enrollments
                     int StudID = possibleStudentIDs[rng.Next(0, possibleStudentIDs.Count)];
+
+                    while(usedIDs.Contains(StudID))
+                    {
+                        StudID = possibleStudentIDs[rng.Next(0, possibleStudentIDs.Count)];
+                    }
+                    usedIDs.Add(StudID);
 
                     //Set the enrollment term 201710, 201720, 201730 etc.
                     string Enroll;
@@ -779,7 +857,7 @@ namespace DBPopulator
                 }
             }
 
-            //ADD BASIC ASSIGNMENT TYPES
+            //ADD BASIC ASSIGNMENT TYPES------------------------------------------------------------
             int id = 0;
             context.AssignmentTypes.Add(new AssignmentType()
             {
@@ -814,27 +892,34 @@ namespace DBPopulator
 
             context.SaveChanges();
 
-            //ADD GRADE TYPE WEIGHTS FOR EACH SECTION
+            //ADD GRADE TYPE WEIGHTS FOR EACH SECTION------------------------------------------------------------
             foreach (int SectID in querySectionList)
             {
+                //calculate weight percentages for assignment types such that they add up to 100%
                 int total = 10;
                 int tempid = 0;
-                float exam = rng.Next(3, 6) / 10;
-                total -= Convert.ToInt32(exam * 10);
+                double exam = (rng.Next(3, 6) / 10.00);
+                total -= Convert.ToInt32(exam * 10.00);
+                exam = (Math.Round(exam, 2));
 
-                float assign = rng.Next(0, total) / 10;
-                total -= Convert.ToInt32(assign * 10);
+                double assign = rng.Next(0, total) / 10.00;
+                total -= Convert.ToInt32(assign * 10.00);
+                assign = (Math.Round(assign, 2));
 
-                float quiz = rng.Next(0, total) / 10;
-                total -= Convert.ToInt32(quiz * 10);
+                double quiz = rng.Next(0, total) / 10.00;
+                total -= Convert.ToInt32(quiz * 10.00);
+                quiz = (Math.Round(quiz, 2));
 
-                float discuss = rng.Next(0, total) / 10;
-                total -= Convert.ToInt32(discuss * 10);
+                double discuss = rng.Next(0, total) / 10.00;
+                total -= Convert.ToInt32(discuss * 10.00);
+                discuss = (Math.Round(discuss, 2));
 
-                float misc = total;
+                double misc = total / 10.0F;
+                misc = (Math.Round(misc, 2));
 
-                float excred = rng.Next(1, 4) / 100;
+                double excred = rng.Next(1, 4) / 100.00;
 
+                //Add grade weights
                 context.GradeWeights.Add(new GradeWeight()
                 {
                     SectionID = SectID,
@@ -863,12 +948,6 @@ namespace DBPopulator
                 {
                     SectionID = SectID,
                     AssignmentTypeID = ++tempid,
-                    WeightPercent = exam
-                });
-                context.GradeWeights.Add(new GradeWeight()
-                {
-                    SectionID = SectID,
-                    AssignmentTypeID = ++tempid,
                     WeightPercent = misc
                 });
                 context.GradeWeights.Add(new GradeWeight()
@@ -879,18 +958,17 @@ namespace DBPopulator
                 });
 
                 context.SaveChanges();
-
             }
 
-            //ADD LETTER GRADE SCALE FOR EACH SECTION
+            //ADD LETTER GRADE SCALE FOR EACH SECTION------------------------------------------------------------
             foreach (int SectID in querySectionList)
             {
+                //lsit of letter grades
                 List<string> Letters = new List<string>()
                 {
                     "A",
                     "A-",
                     "B+",
-                    "B",
                     "B",
                     "B-",
                     "C+",
@@ -902,72 +980,74 @@ namespace DBPopulator
                     "E"
                 };
 
+                //assign grading scale for each letter
                 foreach (string letter in Letters)
                 {
-                    float High;
-                    float Low;
+                    double High;
+                    double Low;
 
                     if(letter == "A")
                     {
-                        High = 200.00F;
-                        Low = 94.00F;
+                        High = 200.00;
+                        Low = 94.00;
                     }
                     else if(letter == "A-")
                     {
-                        High = 93.99F;
-                        Low = 90.00F;
+                        High = 93.99;
+                        Low = 90.00;
                     }
                     else if (letter == "B+")
                     {
-                        High = 89.99F;
-                        Low = 87.00F;
+                        High = 89.99;
+                        Low = 87.00;
                     }
                     else if (letter == "B")
                     {
-                        High = 86.99F;
-                        Low = 84.00F;
+                        High = 86.99;
+                        Low = 84.00;
                     }
                     else if (letter == "B-")
                     {
-                        High = 83.99F;
-                        Low = 80.00F;
+                        High = 83.99;
+                        Low = 80.00;
                     }
                     else if (letter == "C+")
                     {
-                        High = 79.99F;
-                        Low = 77.00F;
+                        High = 79.99;
+                        Low = 77.00;
                     }
                     else if (letter == "C")
                     {
-                        High = 76.99F;
-                        Low = 74.00F;
+                        High = 76.99;
+                        Low = 74.00;
                     }
                     else if (letter == "C-")
                     {
-                        High = 73.99F;
-                        Low = 70.00F;
+                        High = 73.99;
+                        Low = 70.00;
                     }
                     else if (letter == "D+")
                     {
-                        High = 69.99F;
-                        Low = 67.00F;
+                        High = 69.99;
+                        Low = 67.00;
                     }
                     else if (letter == "D")
                     {
-                        High = 66.99F;
-                        Low = 64.00F;
+                        High = 66.99;
+                        Low = 64.00;
                     }
                     else if (letter == "D-")
                     {
-                        High = 63.99F;
-                        Low = 60.00F;
+                        High = 63.99;
+                        Low = 60.00;
                     }
                     else
                     {
-                        High = 59.99F;
-                        Low = 0.00F;
+                        High = 59.99;
+                        Low = 0.00;
                     }
-
+                    
+                    //add the letter grade to the database
                     context.LetterGradeScales.Add(new LetterGradeScale()
                     {
                         SectionID = SectID,
@@ -988,7 +1068,7 @@ namespace DBPopulator
             //    section.InstructorID = section.Instructor.InstructorID;
             //    section.Instructor.Sections.Add(section);
             //}
-
+            /*
             // Add random assignments to sections
             for(int i = 0; i < context.Sections.Count() * 7; i++)
             {
@@ -1039,29 +1119,28 @@ namespace DBPopulator
                 }
 
             }
-
-            context.SaveChanges();
-        }
-
-
+            
+            context.SaveChanges();*/
+            
+        } 
         // Bell curves courtesy of https://stackoverflow.com/questions/5816985/random-number-generator-which-gravitates-numbers-to-any-given-number-in-range
-        /// <summary>
-        /// generate a random number where the likelihood of a large number is greater than the likelihood of a small number
-        /// </summary>
-        /// <param name="rnd">the random number generator used to spawn the number</param>
-        /// <returns>the random number</returns>
-        public static double InverseBellCurve(Random rnd)
-        {
-            return 1 - BellCurve(rnd);
-        }
-        /// <summary>
-        /// generate a random number where the likelihood of a small number is greater than the likelihood of a Large number
-        /// </summary>
-        /// <param name="rnd">the random number generator used to spawn the number</param>
-        /// <returns>the random number</returns>
-        public static double BellCurve(Random rnd)
-        {
-            return Math.Pow(2 * rnd.NextDouble() - 1, 2);
-        }
+            /// <summary>
+            /// generate a random number where the likelihood of a large number is greater than the likelihood of a small number
+            /// </summary>
+            /// <param name="rnd">the random number generator used to spawn the number</param>
+            /// <returns>the random number</returns>
+            public static double InverseBellCurve(Random rnd)
+            {
+                return 1 - BellCurve(rnd);
+            }
+            /// <summary>
+            /// generate a random number where the likelihood of a small number is greater than the likelihood of a Large number
+            /// </summary>
+            /// <param name="rnd">the random number generator used to spawn the number</param>
+            /// <returns>the random number</returns>
+            public static double BellCurve(Random rnd)
+            {
+                return Math.Pow(2 * rnd.NextDouble() - 1, 2);
+            }
     }
 }

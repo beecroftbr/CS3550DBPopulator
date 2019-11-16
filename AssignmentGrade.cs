@@ -15,12 +15,13 @@ namespace DBPopulator
     public partial class AssignmentGrade
     {
         public int SubmissionNum { get; set; }
-        public int StudentID { get; set; }
-        public int AssignmentID { get; set; }
+        public int StudentId { get; set; }
+        public int SectionAssignmentId { get; set; }
         public Nullable<double> Grade { get; set; }
         public Nullable<System.DateTime> SubmissionDate { get; set; }
         public string SubmissionFile { get; set; }
     
-        public virtual AssignmentDetail AssignmentDetail { get; set; }
+        public virtual SectionAssignment SectionAssignment { get; set; }
+        public virtual Student Student { get; set; }
     }
 }

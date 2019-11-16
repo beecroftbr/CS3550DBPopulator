@@ -17,7 +17,6 @@ namespace DBPopulator
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public AssignmentDetail()
         {
-            this.AssignmentGrades = new HashSet<AssignmentGrade>();
             this.SectionAssignments = new HashSet<SectionAssignment>();
         }
     
@@ -27,8 +26,6 @@ namespace DBPopulator
         public string AssignmentTitle { get; set; }
     
         public virtual AssignmentType AssignmentType { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AssignmentGrade> AssignmentGrades { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SectionAssignment> SectionAssignments { get; set; }
     }

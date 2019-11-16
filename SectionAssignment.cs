@@ -14,12 +14,21 @@ namespace DBPopulator
     
     public partial class SectionAssignment
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public SectionAssignment()
+        {
+            this.AssignmentGrades = new HashSet<AssignmentGrade>();
+        }
+    
+        public int SectionAssignmentId { get; set; }
         public int SectionId { get; set; }
-        public int AssignmentID { get; set; }
-        public System.DateTime OpenDate { get; set; }
-        public System.DateTime DueDate { get; set; }
+        public int AssignmentId { get; set; }
+        public Nullable<System.DateTime> OpenDate { get; set; }
+        public Nullable<System.DateTime> DueDate { get; set; }
     
         public virtual AssignmentDetail AssignmentDetail { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<AssignmentGrade> AssignmentGrades { get; set; }
         public virtual Section Section { get; set; }
     }
 }

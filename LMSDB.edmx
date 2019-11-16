@@ -18,9 +18,9 @@
           <Key>
             <PropertyRef Name="SubmissionNum" />
           </Key>
-          <Property Name="SubmissionNum" Type="int" Nullable="false" />
-          <Property Name="StudentID" Type="int" Nullable="false" />
-          <Property Name="AssignmentID" Type="int" Nullable="false" />
+          <Property Name="SubmissionNum" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StudentId" Type="int" Nullable="false" />
+          <Property Name="SectionAssignmentId" Type="int" Nullable="false" />
           <Property Name="Grade" Type="float" />
           <Property Name="SubmissionDate" Type="date" />
           <Property Name="SubmissionFile" Type="varchar" MaxLength="50" />
@@ -100,13 +100,13 @@
         </EntityType>
         <EntityType Name="SectionAssignment">
           <Key>
-            <PropertyRef Name="SectionId" />
-            <PropertyRef Name="AssignmentID" />
+            <PropertyRef Name="SectionAssignmentId" />
           </Key>
+          <Property Name="SectionAssignmentId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="SectionId" Type="int" Nullable="false" />
-          <Property Name="AssignmentID" Type="int" Nullable="false" />
-          <Property Name="OpenDate" Type="date" Nullable="false" />
-          <Property Name="DueDate" Type="date" Nullable="false" />
+          <Property Name="AssignmentId" Type="int" Nullable="false" />
+          <Property Name="OpenDate" Type="date" />
+          <Property Name="DueDate" Type="date" />
         </EntityType>
         <EntityType Name="SectionCourseMat">
           <Key>
@@ -157,15 +157,31 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_AssignmentGrade_AssignmentDetails">
-          <End Role="AssignmentDetails" Type="Self.AssignmentDetails" Multiplicity="1" />
+        <Association Name="FK_AssignmentGrade_SectionAssignment">
+          <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="AssignmentGrade" Type="Self.AssignmentGrade" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="AssignmentDetails">
-              <PropertyRef Name="AssignmentID" />
+            <Principal Role="SectionAssignment">
+              <PropertyRef Name="SectionAssignmentId" />
             </Principal>
             <Dependent Role="AssignmentGrade">
-              <PropertyRef Name="AssignmentID" />
+              <PropertyRef Name="SectionAssignmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AssignmentGrade_Student">
+          <End Role="Student" Type="Self.Student" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AssignmentGrade" Type="Self.AssignmentGrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentID" />
+            </Principal>
+            <Dependent Role="AssignmentGrade">
+              <PropertyRef Name="StudentId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -258,19 +274,23 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_SectionAssignment_AssignmentDetails">
-          <End Role="AssignmentDetails" Type="Self.AssignmentDetails" Multiplicity="1" />
+          <End Role="AssignmentDetails" Type="Self.AssignmentDetails" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AssignmentDetails">
               <PropertyRef Name="AssignmentID" />
             </Principal>
             <Dependent Role="SectionAssignment">
-              <PropertyRef Name="AssignmentID" />
+              <PropertyRef Name="AssignmentId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_SectionAssignment_Section">
-          <End Role="Section" Type="Self.Section" Multiplicity="1" />
+          <End Role="Section" Type="Self.Section" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Section">
@@ -396,8 +416,12 @@
             <End Role="AssignmentType" EntitySet="AssignmentType" />
             <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
           </AssociationSet>
-          <AssociationSet Name="FK_AssignmentGrade_AssignmentDetails" Association="Self.FK_AssignmentGrade_AssignmentDetails">
-            <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
+          <AssociationSet Name="FK_AssignmentGrade_SectionAssignment" Association="Self.FK_AssignmentGrade_SectionAssignment">
+            <End Role="SectionAssignment" EntitySet="SectionAssignment" />
+            <End Role="AssignmentGrade" EntitySet="AssignmentGrade" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AssignmentGrade_Student" Association="Self.FK_AssignmentGrade_Student">
+            <End Role="Student" EntitySet="Student" />
             <End Role="AssignmentGrade" EntitySet="AssignmentGrade" />
           </AssociationSet>
           <AssociationSet Name="FK_Enrollment_Section" Association="Self.FK_Enrollment_Section">
@@ -467,20 +491,20 @@
           <Property Name="PointValue" Type="Double" Nullable="false" />
           <Property Name="AssignmentTitle" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="AssignmentType" Relationship="Self.FK_AssignmentDetails_AssignmentType" FromRole="AssignmentDetails" ToRole="AssignmentType" />
-          <NavigationProperty Name="AssignmentGrades" Relationship="Self.FK_AssignmentGrade_AssignmentDetails" FromRole="AssignmentDetails" ToRole="AssignmentGrade" />
           <NavigationProperty Name="SectionAssignments" Relationship="Self.FK_SectionAssignment_AssignmentDetails" FromRole="AssignmentDetails" ToRole="SectionAssignment" />
         </EntityType>
         <EntityType Name="AssignmentGrade">
           <Key>
             <PropertyRef Name="SubmissionNum" />
           </Key>
-          <Property Name="SubmissionNum" Type="Int32" Nullable="false" />
-          <Property Name="StudentID" Type="Int32" Nullable="false" />
-          <Property Name="AssignmentID" Type="Int32" Nullable="false" />
+          <Property Name="SubmissionNum" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentId" Type="Int32" Nullable="false" />
+          <Property Name="SectionAssignmentId" Type="Int32" Nullable="false" />
           <Property Name="Grade" Type="Double" />
           <Property Name="SubmissionDate" Type="DateTime" Precision="0" />
           <Property Name="SubmissionFile" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="AssignmentDetail" Relationship="Self.FK_AssignmentGrade_AssignmentDetails" FromRole="AssignmentGrade" ToRole="AssignmentDetails" />
+          <NavigationProperty Name="SectionAssignment" Relationship="Self.FK_AssignmentGrade_SectionAssignment" FromRole="AssignmentGrade" ToRole="SectionAssignment" />
+          <NavigationProperty Name="Student" Relationship="Self.FK_AssignmentGrade_Student" FromRole="AssignmentGrade" ToRole="Student" />
         </EntityType>
         <EntityType Name="AssignmentType">
           <Key>
@@ -574,14 +598,15 @@
         </EntityType>
         <EntityType Name="SectionAssignment">
           <Key>
-            <PropertyRef Name="SectionId" />
-            <PropertyRef Name="AssignmentID" />
+            <PropertyRef Name="SectionAssignmentId" />
           </Key>
+          <Property Name="SectionAssignmentId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="SectionId" Type="Int32" Nullable="false" />
-          <Property Name="AssignmentID" Type="Int32" Nullable="false" />
-          <Property Name="OpenDate" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="AssignmentId" Type="Int32" Nullable="false" />
+          <Property Name="OpenDate" Type="DateTime" Precision="0" />
+          <Property Name="DueDate" Type="DateTime" Precision="0" />
           <NavigationProperty Name="AssignmentDetail" Relationship="Self.FK_SectionAssignment_AssignmentDetails" FromRole="SectionAssignment" ToRole="AssignmentDetails" />
+          <NavigationProperty Name="AssignmentGrades" Relationship="Self.FK_AssignmentGrade_SectionAssignment" FromRole="SectionAssignment" ToRole="AssignmentGrade" />
           <NavigationProperty Name="Section" Relationship="Self.FK_SectionAssignment_Section" FromRole="SectionAssignment" ToRole="Section" />
         </EntityType>
         <EntityType Name="Student">
@@ -594,6 +619,7 @@
           <Property Name="Email" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
           <Property Name="Address" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
           <Property Name="Zip" Type="Int32" />
+          <NavigationProperty Name="AssignmentGrades" Relationship="Self.FK_AssignmentGrade_Student" FromRole="Student" ToRole="AssignmentGrade" />
           <NavigationProperty Name="Zipcode" Relationship="Self.FK_Student_Zip" FromRole="Student" ToRole="Zipcode" />
         </EntityType>
         <EntityType Name="sysdiagram">
@@ -628,27 +654,45 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_AssignmentGrade_AssignmentDetails">
-          <End Role="AssignmentDetails" Type="Self.AssignmentDetail" Multiplicity="1" />
-          <End Role="AssignmentGrade" Type="Self.AssignmentGrade" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AssignmentDetails">
-              <PropertyRef Name="AssignmentID" />
-            </Principal>
-            <Dependent Role="AssignmentGrade">
-              <PropertyRef Name="AssignmentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_SectionAssignment_AssignmentDetails">
-          <End Role="AssignmentDetails" Type="Self.AssignmentDetail" Multiplicity="1" />
+          <End Role="AssignmentDetails" Type="Self.AssignmentDetail" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AssignmentDetails">
               <PropertyRef Name="AssignmentID" />
             </Principal>
             <Dependent Role="SectionAssignment">
-              <PropertyRef Name="AssignmentID" />
+              <PropertyRef Name="AssignmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AssignmentGrade_SectionAssignment">
+          <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AssignmentGrade" Type="Self.AssignmentGrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SectionAssignment">
+              <PropertyRef Name="SectionAssignmentId" />
+            </Principal>
+            <Dependent Role="AssignmentGrade">
+              <PropertyRef Name="SectionAssignmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AssignmentGrade_Student">
+          <End Role="Student" Type="Self.Student" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AssignmentGrade" Type="Self.AssignmentGrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentID" />
+            </Principal>
+            <Dependent Role="AssignmentGrade">
+              <PropertyRef Name="StudentId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -741,7 +785,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_SectionAssignment_Section">
-          <End Role="Section" Type="Self.Section" Multiplicity="1" />
+          <End Role="Section" Type="Self.Section" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Section">
@@ -787,13 +833,17 @@
             <End Role="AssignmentType" EntitySet="AssignmentTypes" />
             <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
           </AssociationSet>
-          <AssociationSet Name="FK_AssignmentGrade_AssignmentDetails" Association="Self.FK_AssignmentGrade_AssignmentDetails">
-            <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
-            <End Role="AssignmentGrade" EntitySet="AssignmentGrades" />
-          </AssociationSet>
           <AssociationSet Name="FK_SectionAssignment_AssignmentDetails" Association="Self.FK_SectionAssignment_AssignmentDetails">
             <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
             <End Role="SectionAssignment" EntitySet="SectionAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AssignmentGrade_SectionAssignment" Association="Self.FK_AssignmentGrade_SectionAssignment">
+            <End Role="SectionAssignment" EntitySet="SectionAssignments" />
+            <End Role="AssignmentGrade" EntitySet="AssignmentGrades" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AssignmentGrade_Student" Association="Self.FK_AssignmentGrade_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="AssignmentGrade" EntitySet="AssignmentGrades" />
           </AssociationSet>
           <AssociationSet Name="FK_GradeWeights_AssignmentType" Association="Self.FK_GradeWeights_AssignmentType">
             <End Role="AssignmentType" EntitySet="AssignmentTypes" />
@@ -902,8 +952,8 @@
             <EntityTypeMapping TypeName="LMSModel.AssignmentGrade">
               <MappingFragment StoreEntitySet="AssignmentGrade">
                 <ScalarProperty Name="SubmissionNum" ColumnName="SubmissionNum" />
-                <ScalarProperty Name="StudentID" ColumnName="StudentID" />
-                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+                <ScalarProperty Name="SectionAssignmentId" ColumnName="SectionAssignmentId" />
                 <ScalarProperty Name="Grade" ColumnName="Grade" />
                 <ScalarProperty Name="SubmissionDate" ColumnName="SubmissionDate" />
                 <ScalarProperty Name="SubmissionFile" ColumnName="SubmissionFile" />
@@ -991,8 +1041,9 @@
           <EntitySetMapping Name="SectionAssignments">
             <EntityTypeMapping TypeName="LMSModel.SectionAssignment">
               <MappingFragment StoreEntitySet="SectionAssignment">
+                <ScalarProperty Name="SectionAssignmentId" ColumnName="SectionAssignmentId" />
                 <ScalarProperty Name="SectionId" ColumnName="SectionId" />
-                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="AssignmentId" ColumnName="AssignmentId" />
                 <ScalarProperty Name="OpenDate" ColumnName="OpenDate" />
                 <ScalarProperty Name="DueDate" ColumnName="DueDate" />
               </MappingFragment>

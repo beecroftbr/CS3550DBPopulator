@@ -497,9 +497,9 @@ namespace DBPopulator
                     state = "Utah",
                     zip = ziplist.ElementAt(i)
                 });
-                context.SaveChanges();
                 i++;
             };
+            context.SaveChanges();
 
             //ADD BASIC ASSIGNMENT TYPES------------------------------------------------------------
             int id = 0;
@@ -604,7 +604,6 @@ namespace DBPopulator
                     Address = rng.Next(5000) + " " + streetPreDirection + " " + (rng.Next(500) * 10) + " " + streetPostDirection,
                     Zip = ziplist[rng.Next(0,ziplist.Count)]
                 });
-                context.SaveChanges();
             }
             
             var IntIDs = context.Instructors.Select(x => x.InstructorID);
@@ -618,6 +617,7 @@ namespace DBPopulator
             {
                 lastIID = 0;
             }
+            context.SaveChanges();
             // Add 20 instructors------------------------------------------------------------
             for (int i = 0; i < numberofInstructors; i++)
             {
@@ -675,9 +675,8 @@ namespace DBPopulator
                     Address = rng.Next(5000) + " " + streetPreDirection + " " + (rng.Next(500) * 10) + " " + streetPostDirection,
                     Zip = ziplist[rng.Next(0,ziplist.Count)]
                 });
-                context.SaveChanges();
             }
-            
+            context.SaveChanges();
             //ADD COURSES----------------------------------
             //Possible Course Subjects
             List<string> CourseSubjects = new List<string>()
@@ -768,11 +767,9 @@ namespace DBPopulator
                     CourseID = CourseNo,
                     CourseName = CourseTitle
                 });
-
-                context.SaveChanges();
             }
 
-            
+            context.SaveChanges();
             //ADD Sections-----------------------------------
             var queryCourses = context.Courses.Select(x => x.CourseID);
             List<string> queryCourseList = queryCourses.ToList();
@@ -857,11 +854,9 @@ namespace DBPopulator
                         EndDate = EDate,
                         HTMLPath = null
                     });
-
-                    context.SaveChanges();
                 }
             }
-            
+            context.SaveChanges();
             //ADD STUDENT ENROLLMENTS TO EACH SECTION-----------------------------------
             //get a list of the sections
             var querySections = context.Sections.Select(x => x.SectionID);
@@ -916,11 +911,9 @@ namespace DBPopulator
                         EnrollmentTerm = Enroll,
                         LetterGrade = "IP"
                     });
-
-                    context.SaveChanges();
                 }
             }
-
+            context.SaveChanges();
             //ADD GRADE TYPE WEIGHTS FOR EACH SECTION------------------------------------------------------------
             foreach (int SectID in querySectionList.Except(enrolledSect))
             {
@@ -985,10 +978,8 @@ namespace DBPopulator
                     AssignmentTypeID = ++tempid,
                     WeightPercent = excred
                 });
-
-                context.SaveChanges();
             }
-
+            context.SaveChanges();
             //ADD LETTER GRADE SCALE FOR EACH SECTION------------------------------------------------------------
             foreach (int SectID in querySectionList.Except(enrolledSect))
             {
@@ -1084,35 +1075,46 @@ namespace DBPopulator
                         GradeHigh = High,
                         GradeLow = Low
                     });
-
-                    context.SaveChanges();
                 }
             }
-
+            context.SaveChanges();
             //Generate assignment details
+            var AssgnIDs = context.AssignmentDetails.Select(x => x.AssignmentID);
+            List<int> AIDs = AssgnIDs.ToList();
+            int lastAID;
+            if(AIDs.Count > 0)
+            {
+                lastAID = AIDs.Max();
+            }
+            else
+            {
+                lastAID = 0;
+            }
             for(int i = 0; i < context.Sections.Count() *10; i++)
             {
                 int assignmentID = context.AssignmentDetails.Any() ? context.AssignmentDetails.OrderBy(a => a.AssignmentID).Last().AssignmentID + 1 : 1;
-
+                List<AssignmentType> TypeList = context.AssignmentTypes.ToList();
                 context.AssignmentDetails.Add(new AssignmentDetail()
                 {
-                    AssignmentID = assignmentID,
+                    AssignmentID = ++lastAID,
 
                     PointValue = rng.Next(0, 11) * 10,
                     AssignmentTitle = "Assignment " + i,
-                    AssignmentTypeID = context.AssignmentTypes.ElementAt(rng.Next(context.AssignmentTypes.Count())).AssignmentTypeID,
+                    AssignmentTypeID = TypeList.ElementAt(rng.Next(context.AssignmentTypes.Count())).AssignmentTypeID,
                 });
             }
 
+            context.SaveChanges();
             // Add assignments to sections
             foreach(var section in context.Sections)
             {
                 var sectionID = section.SectionID;
                 int daysDiff = ((TimeSpan)(section.EndDate - section.BeginDate)).Days;
+                List<AssignmentDetail> DetailList = context.AssignmentDetails.ToList();
                 for (int i = 0; i < rng.Next(5, 10); i++)
                 {
                     var dueDate = section.BeginDate.AddDays(rng.Next(daysDiff));
-                    var assignID = context.AssignmentDetails.ElementAt(rng.Next(context.AssignmentDetails.Count())).AssignmentID;
+                    var assignID = DetailList.ElementAt(rng.Next(context.AssignmentDetails.Count())).AssignmentID;
                     var secAssignment = new SectionAssignment()
                     {
                         AssignmentID = assignID,
@@ -1124,9 +1126,10 @@ namespace DBPopulator
                     };
                     context.SectionAssignments.Add(secAssignment);
                     // This below statement may not be needed.  Double check.
-                    section.SectionAssignments.Add(secAssignment);
+                    //section.SectionAssignments.Add(secAssignment);
                 }
             }
+            context.SaveChanges();
 
             //TODO:  Add assignmentgrades
 

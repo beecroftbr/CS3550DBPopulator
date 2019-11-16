@@ -4,23 +4,24 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="cef31c2a8d72491faaaa4b31eff3621a" Name="Diagram1" ZoomLevel="97">
-        <EntityTypeShape EntityType="LMSModel.AssignmentDetail" Width="2.875" PointX="3" PointY="5.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.AssignmentGrade" Width="1.5" PointX="6.25" PointY="6.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.AssignmentType" Width="1.5" PointX="0.75" PointY="5.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.Course" Width="1.5" PointX="6" PointY="2.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.CourseMat" Width="1.5" PointX="6" PointY="9.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.Enrollment" Width="1.5" PointX="10.5" PointY="4.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.GradeWeight" Width="1.5" PointX="13.5" PointY="5.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.Instructor" Width="1.5" PointX="6" PointY="11.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.LetterGradeScale" Width="1.5" PointX="10.5" PointY="9.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.Section" Width="1.5" PointX="8.25" PointY="4.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.Student" Width="1.5" PointX="6" PointY="15.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.sysdiagram" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="LMSModel.Zipcode" Width="1.5" PointX="3.75" PointY="12.125" IsExpanded="true" />
-        <AssociationConnector Association="LMSModel.FK_AssignmentDetails_AssignmentDetails" ManuallyRouted="false" />
+      <Diagram DiagramId="2c4734d0b9714fb681e282e7868d7306" Name="Diagram1">
+        <EntityTypeShape EntityType="LMSModel.AssignmentDetail" Width="1.5" PointX="8.25" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.AssignmentGrade" Width="1.5" PointX="10.5" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.AssignmentType" Width="1.5" PointX="6" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.Course" Width="1.5" PointX="3" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.CourseMat" Width="1.5" PointX="3" PointY="12.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.Enrollment" Width="1.5" PointX="7.5" PointY="4.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.GradeWeight" Width="1.5" PointX="10.5" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.Instructor" Width="1.5" PointX="3" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.LetterGradeScale" Width="1.5" PointX="7.5" PointY="10" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.Section" Width="1.5" PointX="5.25" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.SectionAssignment" Width="1.5" PointX="10.5" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.Student" Width="1.5" PointX="3" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.sysdiagram" Width="1.5" PointX="12.75" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="LMSModel.Zipcode" Width="1.5" PointX="0.75" PointY="7.5" IsExpanded="true" />
         <AssociationConnector Association="LMSModel.FK_AssignmentDetails_AssignmentType" ManuallyRouted="false" />
         <AssociationConnector Association="LMSModel.FK_AssignmentGrade_AssignmentDetails" ManuallyRouted="false" />
+        <AssociationConnector Association="LMSModel.FK_SectionAssignment_AssignmentDetails" ManuallyRouted="false" />
         <AssociationConnector Association="LMSModel.FK_GradeWeights_AssignmentType" ManuallyRouted="false" />
         <AssociationConnector Association="LMSModel.FK_Section_Course" ManuallyRouted="false" />
         <AssociationConnector Association="LMSModel.FK_Enrollment_Section" ManuallyRouted="false" />
@@ -28,8 +29,8 @@
         <AssociationConnector Association="LMSModel.FK_Instructor_Zipcode" ManuallyRouted="false" />
         <AssociationConnector Association="LMSModel.FK_Section_Instructor" ManuallyRouted="false" />
         <AssociationConnector Association="LMSModel.FK_LetterGradeScale_Section" ManuallyRouted="false" />
+        <AssociationConnector Association="LMSModel.FK_SectionAssignment_Section" ManuallyRouted="false" />
         <AssociationConnector Association="LMSModel.FK_Student_Zip" ManuallyRouted="false" />
-        <AssociationConnector Association="LMSModel.SectionAssignment" ManuallyRouted="false" />
         <AssociationConnector Association="LMSModel.SectionCourseMat" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>

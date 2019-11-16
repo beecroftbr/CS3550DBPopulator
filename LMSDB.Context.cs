@@ -37,6 +37,7 @@ namespace DBPopulator
         public virtual DbSet<Instructor> Instructors { get; set; }
         public virtual DbSet<LetterGradeScale> LetterGradeScales { get; set; }
         public virtual DbSet<Section> Sections { get; set; }
+        public virtual DbSet<SectionAssignment> SectionAssignments { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<Zipcode> Zipcodes { get; set; }

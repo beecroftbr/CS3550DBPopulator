@@ -99,6 +99,9 @@
     <Compile Include="Section.cs">
       <DependentUpon>LMSDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="SectionAssignment.cs">
+      <DependentUpon>LMSDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Student.cs">
       <DependentUpon>LMSDB.tt</DependentUpon>
     </Compile>

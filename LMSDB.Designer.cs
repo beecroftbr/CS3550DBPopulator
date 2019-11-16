@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'C:\Users\jakeb\Source\Repos\beecroftbr\CS3550DBPopulator\LMSDB.edmx'. 
+﻿// T4 code generation is enabled for model 'C:\Users\Sparlight\Desktop\Brandon's College Work\Fall 2019\Database\Group Project\DBPopulator\LMSDB.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

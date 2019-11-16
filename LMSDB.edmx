@@ -10,10 +10,9 @@
             <PropertyRef Name="AssignmentID" />
           </Key>
           <Property Name="AssignmentID" Type="int" Nullable="false" />
-          <Property Name="DueDate" Type="date" Nullable="false" />
-          <Property Name="OpenDate" Type="date" Nullable="false" />
-          <Property Name="PointValue" Type="float" Nullable="false" />
           <Property Name="AssignmentTypeID" Type="int" Nullable="false" />
+          <Property Name="PointValue" Type="float" Nullable="false" />
+          <Property Name="AssignmentTitle" Type="varchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="AssignmentGrade">
           <Key>
@@ -101,11 +100,13 @@
         </EntityType>
         <EntityType Name="SectionAssignment">
           <Key>
-            <PropertyRef Name="SectionID" />
+            <PropertyRef Name="SectionId" />
             <PropertyRef Name="AssignmentID" />
           </Key>
-          <Property Name="SectionID" Type="int" Nullable="false" />
+          <Property Name="SectionId" Type="int" Nullable="false" />
           <Property Name="AssignmentID" Type="int" Nullable="false" />
+          <Property Name="OpenDate" Type="date" Nullable="false" />
+          <Property Name="DueDate" Type="date" Nullable="false" />
         </EntityType>
         <EntityType Name="SectionCourseMat">
           <Key>
@@ -144,18 +145,6 @@
           <Property Name="city" Type="varchar" MaxLength="80" />
           <Property Name="state" Type="varchar" MaxLength="20" />
         </EntityType>
-        <Association Name="FK_AssignmentDetails_AssignmentDetails">
-          <End Role="AssignmentDetails" Type="Self.AssignmentDetails" Multiplicity="1" />
-          <End Role="AssignmentDetails1" Type="Self.AssignmentDetails" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="AssignmentDetails">
-              <PropertyRef Name="AssignmentID" />
-            </Principal>
-            <Dependent Role="AssignmentDetails1">
-              <PropertyRef Name="AssignmentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_AssignmentDetails_AssignmentType">
           <End Role="AssignmentType" Type="Self.AssignmentType" Multiplicity="1" />
           <End Role="AssignmentDetails" Type="Self.AssignmentDetails" Multiplicity="*" />
@@ -269,9 +258,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_SectionAssignment_AssignmentDetails">
-          <End Role="AssignmentDetails" Type="Self.AssignmentDetails" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+          <End Role="AssignmentDetails" Type="Self.AssignmentDetails" Multiplicity="1" />
           <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AssignmentDetails">
@@ -283,16 +270,14 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_SectionAssignment_Section">
-          <End Role="Section" Type="Self.Section" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+          <End Role="Section" Type="Self.Section" Multiplicity="1" />
           <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Section">
               <PropertyRef Name="SectionID" />
             </Principal>
             <Dependent Role="SectionAssignment">
-              <PropertyRef Name="SectionID" />
+              <PropertyRef Name="SectionId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -407,10 +392,6 @@
           <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Zipcode" EntityType="Self.Zipcode" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_AssignmentDetails_AssignmentDetails" Association="Self.FK_AssignmentDetails_AssignmentDetails">
-            <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
-            <End Role="AssignmentDetails1" EntitySet="AssignmentDetails" />
-          </AssociationSet>
           <AssociationSet Name="FK_AssignmentDetails_AssignmentType" Association="Self.FK_AssignmentDetails_AssignmentType">
             <End Role="AssignmentType" EntitySet="AssignmentType" />
             <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
@@ -482,15 +463,12 @@
             <PropertyRef Name="AssignmentID" />
           </Key>
           <Property Name="AssignmentID" Type="Int32" Nullable="false" />
-          <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="OpenDate" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="PointValue" Type="Double" Nullable="false" />
           <Property Name="AssignmentTypeID" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="AssignmentDetails1" Relationship="Self.FK_AssignmentDetails_AssignmentDetails" FromRole="AssignmentDetails" ToRole="AssignmentDetails1" />
-          <NavigationProperty Name="AssignmentDetail1" Relationship="Self.FK_AssignmentDetails_AssignmentDetails" FromRole="AssignmentDetails1" ToRole="AssignmentDetails" />
+          <Property Name="PointValue" Type="Double" Nullable="false" />
+          <Property Name="AssignmentTitle" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="AssignmentType" Relationship="Self.FK_AssignmentDetails_AssignmentType" FromRole="AssignmentDetails" ToRole="AssignmentType" />
           <NavigationProperty Name="AssignmentGrades" Relationship="Self.FK_AssignmentGrade_AssignmentDetails" FromRole="AssignmentDetails" ToRole="AssignmentGrade" />
-          <NavigationProperty Name="Sections" Relationship="Self.SectionAssignment" FromRole="AssignmentDetails" ToRole="Section" />
+          <NavigationProperty Name="SectionAssignments" Relationship="Self.FK_SectionAssignment_AssignmentDetails" FromRole="AssignmentDetails" ToRole="SectionAssignment" />
         </EntityType>
         <EntityType Name="AssignmentGrade">
           <Key>
@@ -591,8 +569,20 @@
           <NavigationProperty Name="GradeWeights" Relationship="Self.FK_GradeWeights_Section" FromRole="Section" ToRole="GradeWeights" />
           <NavigationProperty Name="Instructor" Relationship="Self.FK_Section_Instructor" FromRole="Section" ToRole="Instructor" />
           <NavigationProperty Name="LetterGradeScales" Relationship="Self.FK_LetterGradeScale_Section" FromRole="Section" ToRole="LetterGradeScale" />
-          <NavigationProperty Name="AssignmentDetails" Relationship="Self.SectionAssignment" FromRole="Section" ToRole="AssignmentDetails" />
+          <NavigationProperty Name="SectionAssignments" Relationship="Self.FK_SectionAssignment_Section" FromRole="Section" ToRole="SectionAssignment" />
           <NavigationProperty Name="CourseMats" Relationship="Self.SectionCourseMat" FromRole="Section" ToRole="CourseMat" />
+        </EntityType>
+        <EntityType Name="SectionAssignment">
+          <Key>
+            <PropertyRef Name="SectionId" />
+            <PropertyRef Name="AssignmentID" />
+          </Key>
+          <Property Name="SectionId" Type="Int32" Nullable="false" />
+          <Property Name="AssignmentID" Type="Int32" Nullable="false" />
+          <Property Name="OpenDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="AssignmentDetail" Relationship="Self.FK_SectionAssignment_AssignmentDetails" FromRole="SectionAssignment" ToRole="AssignmentDetails" />
+          <NavigationProperty Name="Section" Relationship="Self.FK_SectionAssignment_Section" FromRole="SectionAssignment" ToRole="Section" />
         </EntityType>
         <EntityType Name="Student">
           <Key>
@@ -626,18 +616,6 @@
           <NavigationProperty Name="Instructors" Relationship="Self.FK_Instructor_Zipcode" FromRole="Zipcode" ToRole="Instructor" />
           <NavigationProperty Name="Students" Relationship="Self.FK_Student_Zip" FromRole="Zipcode" ToRole="Student" />
         </EntityType>
-        <Association Name="FK_AssignmentDetails_AssignmentDetails">
-          <End Role="AssignmentDetails" Type="Self.AssignmentDetail" Multiplicity="1" />
-          <End Role="AssignmentDetails1" Type="Self.AssignmentDetail" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="AssignmentDetails">
-              <PropertyRef Name="AssignmentID" />
-            </Principal>
-            <Dependent Role="AssignmentDetails1">
-              <PropertyRef Name="AssignmentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_AssignmentDetails_AssignmentType">
           <End Role="AssignmentType" Type="Self.AssignmentType" Multiplicity="1" />
           <End Role="AssignmentDetails" Type="Self.AssignmentDetail" Multiplicity="*" />
@@ -658,6 +636,18 @@
               <PropertyRef Name="AssignmentID" />
             </Principal>
             <Dependent Role="AssignmentGrade">
+              <PropertyRef Name="AssignmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SectionAssignment_AssignmentDetails">
+          <End Role="AssignmentDetails" Type="Self.AssignmentDetail" Multiplicity="1" />
+          <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AssignmentDetails">
+              <PropertyRef Name="AssignmentID" />
+            </Principal>
+            <Dependent Role="SectionAssignment">
               <PropertyRef Name="AssignmentID" />
             </Dependent>
           </ReferentialConstraint>
@@ -750,6 +740,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_SectionAssignment_Section">
+          <End Role="Section" Type="Self.Section" Multiplicity="1" />
+          <End Role="SectionAssignment" Type="Self.SectionAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Section">
+              <PropertyRef Name="SectionID" />
+            </Principal>
+            <Dependent Role="SectionAssignment">
+              <PropertyRef Name="SectionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Student_Zip">
           <End Role="Zipcode" Type="Self.Zipcode" Multiplicity="0..1" />
           <End Role="Student" Type="Self.Student" Multiplicity="*" />
@@ -761,10 +763,6 @@
               <PropertyRef Name="Zip" />
             </Dependent>
           </ReferentialConstraint>
-        </Association>
-        <Association Name="SectionAssignment">
-          <End Role="AssignmentDetails" Type="Self.AssignmentDetail" Multiplicity="*" />
-          <End Role="Section" Type="Self.Section" Multiplicity="*" />
         </Association>
         <Association Name="SectionCourseMat">
           <End Role="CourseMat" Type="Self.CourseMat" Multiplicity="*" />
@@ -781,13 +779,10 @@
           <EntitySet Name="Instructors" EntityType="Self.Instructor" />
           <EntitySet Name="LetterGradeScales" EntityType="Self.LetterGradeScale" />
           <EntitySet Name="Sections" EntityType="Self.Section" />
+          <EntitySet Name="SectionAssignments" EntityType="Self.SectionAssignment" />
           <EntitySet Name="Students" EntityType="Self.Student" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
           <EntitySet Name="Zipcodes" EntityType="Self.Zipcode" />
-          <AssociationSet Name="FK_AssignmentDetails_AssignmentDetails" Association="Self.FK_AssignmentDetails_AssignmentDetails">
-            <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
-            <End Role="AssignmentDetails1" EntitySet="AssignmentDetails" />
-          </AssociationSet>
           <AssociationSet Name="FK_AssignmentDetails_AssignmentType" Association="Self.FK_AssignmentDetails_AssignmentType">
             <End Role="AssignmentType" EntitySet="AssignmentTypes" />
             <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
@@ -795,6 +790,10 @@
           <AssociationSet Name="FK_AssignmentGrade_AssignmentDetails" Association="Self.FK_AssignmentGrade_AssignmentDetails">
             <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
             <End Role="AssignmentGrade" EntitySet="AssignmentGrades" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SectionAssignment_AssignmentDetails" Association="Self.FK_SectionAssignment_AssignmentDetails">
+            <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
+            <End Role="SectionAssignment" EntitySet="SectionAssignments" />
           </AssociationSet>
           <AssociationSet Name="FK_GradeWeights_AssignmentType" Association="Self.FK_GradeWeights_AssignmentType">
             <End Role="AssignmentType" EntitySet="AssignmentTypes" />
@@ -824,13 +823,13 @@
             <End Role="Section" EntitySet="Sections" />
             <End Role="LetterGradeScale" EntitySet="LetterGradeScales" />
           </AssociationSet>
+          <AssociationSet Name="FK_SectionAssignment_Section" Association="Self.FK_SectionAssignment_Section">
+            <End Role="Section" EntitySet="Sections" />
+            <End Role="SectionAssignment" EntitySet="SectionAssignments" />
+          </AssociationSet>
           <AssociationSet Name="FK_Student_Zip" Association="Self.FK_Student_Zip">
             <End Role="Zipcode" EntitySet="Zipcodes" />
             <End Role="Student" EntitySet="Students" />
-          </AssociationSet>
-          <AssociationSet Name="SectionAssignment" Association="Self.SectionAssignment">
-            <End Role="AssignmentDetails" EntitySet="AssignmentDetails" />
-            <End Role="Section" EntitySet="Sections" />
           </AssociationSet>
           <AssociationSet Name="SectionCourseMat" Association="Self.SectionCourseMat">
             <End Role="CourseMat" EntitySet="CourseMats" />
@@ -893,10 +892,9 @@
             <EntityTypeMapping TypeName="LMSModel.AssignmentDetail">
               <MappingFragment StoreEntitySet="AssignmentDetails">
                 <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
-                <ScalarProperty Name="DueDate" ColumnName="DueDate" />
-                <ScalarProperty Name="OpenDate" ColumnName="OpenDate" />
-                <ScalarProperty Name="PointValue" ColumnName="PointValue" />
                 <ScalarProperty Name="AssignmentTypeID" ColumnName="AssignmentTypeID" />
+                <ScalarProperty Name="PointValue" ColumnName="PointValue" />
+                <ScalarProperty Name="AssignmentTitle" ColumnName="AssignmentTitle" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -990,6 +988,16 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="SectionAssignments">
+            <EntityTypeMapping TypeName="LMSModel.SectionAssignment">
+              <MappingFragment StoreEntitySet="SectionAssignment">
+                <ScalarProperty Name="SectionId" ColumnName="SectionId" />
+                <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
+                <ScalarProperty Name="OpenDate" ColumnName="OpenDate" />
+                <ScalarProperty Name="DueDate" ColumnName="DueDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Students">
             <EntityTypeMapping TypeName="LMSModel.Student">
               <MappingFragment StoreEntitySet="Student">
@@ -1022,14 +1030,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="SectionAssignment" TypeName="LMSModel.SectionAssignment" StoreEntitySet="SectionAssignment">
-            <EndProperty Name="AssignmentDetails">
-              <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
-            </EndProperty>
-            <EndProperty Name="Section">
-              <ScalarProperty Name="SectionID" ColumnName="SectionID" />
-            </EndProperty>
-          </AssociationSetMapping>
           <AssociationSetMapping Name="SectionCourseMat" TypeName="LMSModel.SectionCourseMat" StoreEntitySet="SectionCourseMat">
             <EndProperty Name="CourseMat">
               <ScalarProperty Name="CourseMatID" ColumnName="CourseMatID" />

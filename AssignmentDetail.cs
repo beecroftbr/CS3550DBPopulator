@@ -18,21 +18,18 @@ namespace DBPopulator
         public AssignmentDetail()
         {
             this.AssignmentGrades = new HashSet<AssignmentGrade>();
-            this.Sections = new HashSet<Section>();
+            this.SectionAssignments = new HashSet<SectionAssignment>();
         }
     
         public int AssignmentID { get; set; }
-        public System.DateTime DueDate { get; set; }
-        public System.DateTime OpenDate { get; set; }
-        public double PointValue { get; set; }
         public int AssignmentTypeID { get; set; }
+        public double PointValue { get; set; }
+        public string AssignmentTitle { get; set; }
     
-        public virtual AssignmentDetail AssignmentDetails1 { get; set; }
-        public virtual AssignmentDetail AssignmentDetail1 { get; set; }
         public virtual AssignmentType AssignmentType { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AssignmentGrade> AssignmentGrades { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Section> Sections { get; set; }
+        public virtual ICollection<SectionAssignment> SectionAssignments { get; set; }
     }
 }

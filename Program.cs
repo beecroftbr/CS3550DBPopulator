@@ -634,6 +634,7 @@ namespace DBPopulator
 
                 string streetPreDirection = "";
                 string streetPostDirection = "";
+                bool preDirectionNS = false;
                 switch (rng.Next(0,4))
                 {
                     case 0:
@@ -649,20 +650,20 @@ namespace DBPopulator
                         streetPreDirection = "W";
                         break;
                 }
-                switch (rng.Next(0,4))
+                if(streetPreDirection == "N" || streetPreDirection == "S")
                 {
-                    case 0:
-                        streetPostDirection = "N";
-                        break;
-                    case 1:
-                        streetPostDirection = "S";
-                        break;
-                    case 2:
-                        streetPostDirection = "E";
-                        break;
-                    case 3:
-                        streetPostDirection = "W";
-                        break;
+                    preDirectionNS = true;
+                }
+                int nextDirection = rng.Next(0, 2);
+                if (preDirectionNS)
+                {
+                    if (nextDirection == 0) streetPostDirection = "E";
+                    else streetPostDirection = "W";
+                }
+                else
+                {
+                    if (nextDirection == 0) streetPostDirection = "N";
+                    else streetPostDirection = "S";
                 }
 
                 context.Instructors.Add(new Instructor()
@@ -1087,6 +1088,51 @@ namespace DBPopulator
                     context.SaveChanges();
                 }
             }
+
+            //Generate assignment details
+            for(int i = 0; i < context.Sections.Count() *10; i++)
+            {
+                int assignmentID = context.AssignmentDetails.Any() ? context.AssignmentDetails.OrderBy(a => a.AssignmentID).Last().AssignmentID + 1 : 1;
+
+                context.AssignmentDetails.Add(new AssignmentDetail()
+                {
+                    AssignmentID = assignmentID,
+
+                    PointValue = rng.Next(0, 11) * 10,
+                    AssignmentTitle = "Assignment " + i,
+                    AssignmentTypeID = context.AssignmentTypes.ElementAt(rng.Next(context.AssignmentTypes.Count())).AssignmentTypeID,
+                });
+            }
+
+            // Add assignments to sections
+            foreach(var section in context.Sections)
+            {
+                var sectionID = section.SectionID;
+                int daysDiff = ((TimeSpan)(section.EndDate - section.BeginDate)).Days;
+                for (int i = 0; i < rng.Next(5, 10); i++)
+                {
+                    var dueDate = section.BeginDate.AddDays(rng.Next(daysDiff));
+                    var assignID = context.AssignmentDetails.ElementAt(rng.Next(context.AssignmentDetails.Count())).AssignmentID;
+                    var secAssignment = new SectionAssignment()
+                    {
+                        AssignmentID = assignID,
+                        DueDate = dueDate,
+                        OpenDate = dueDate.AddDays(-7 * rng.Next(0, 2)),
+                        SectionId = section.SectionID,
+                        Section = section,
+                        AssignmentDetail = context.AssignmentDetails.First(a => a.AssignmentID == assignID)
+                    };
+                    context.SectionAssignments.Add(secAssignment);
+                    // This below statement may not be needed.  Double check.
+                    section.SectionAssignments.Add(secAssignment);
+                }
+            }
+
+            //TODO:  Add assignmentgrades
+
+
+
+
 
             // Commented out:  this may have already been done
             //// Add instructor details to sections

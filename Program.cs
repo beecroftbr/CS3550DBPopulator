@@ -576,6 +576,7 @@ namespace DBPopulator
 
                 string streetPreDirection = "";
                 string streetPostDirection = "";
+                bool preDirectionNS = false;
                 switch (rng.Next(0,4))
                 {
                     case 0:
@@ -591,20 +592,20 @@ namespace DBPopulator
                         streetPreDirection = "W";
                         break;
                 }
-                switch (rng.Next(0,4))
+                if(streetPreDirection == "N" || streetPreDirection == "S")
                 {
-                    case 0:
-                        streetPostDirection = "N";
-                        break;
-                    case 1:
-                        streetPostDirection = "S";
-                        break;
-                    case 2:
-                        streetPostDirection = "E";
-                        break;
-                    case 3:
-                        streetPostDirection = "W";
-                        break;
+                    preDirectionNS = true;
+                }
+                int nextDirection = rng.Next(0, 2);
+                if (preDirectionNS)
+                {
+                    if (nextDirection == 0) streetPostDirection = "E";
+                    else streetPostDirection = "W";
+                }
+                else
+                {
+                    if (nextDirection == 0) streetPostDirection = "N";
+                    else streetPostDirection = "S";
                 }
 
                 context.Instructors.Add(new Instructor()

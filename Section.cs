@@ -20,7 +20,7 @@ namespace DBPopulator
             this.Enrollments = new HashSet<Enrollment>();
             this.GradeWeights = new HashSet<GradeWeight>();
             this.LetterGradeScales = new HashSet<LetterGradeScale>();
-            this.AssignmentDetails = new HashSet<AssignmentDetail>();
+            this.SectionAssignments = new HashSet<SectionAssignment>();
             this.CourseMats = new HashSet<CourseMat>();
         }
     
@@ -40,7 +40,7 @@ namespace DBPopulator
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<LetterGradeScale> LetterGradeScales { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AssignmentDetail> AssignmentDetails { get; set; }
+        public virtual ICollection<SectionAssignment> SectionAssignments { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CourseMat> CourseMats { get; set; }
     }

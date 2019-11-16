@@ -501,6 +501,53 @@ namespace DBPopulator
                 i++;
             };
 
+            //ADD BASIC ASSIGNMENT TYPES------------------------------------------------------------
+            int id = 0;
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Exams"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Assignments"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Quizzes"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Discussions"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Misc"
+            });
+            context.AssignmentTypes.Add(new AssignmentType()
+            {
+                AssignmentTypeID = ++id,
+                Description = "Extra Credit"
+            });
+
+            context.SaveChanges();
+
+            var StudentIDs = context.Students.Select(x => x.StudentID);
+            List<int> SIDs = StudentIDs.ToList();
+            int lastSID;
+            if(SIDs.Count > 0)
+            {
+                lastSID = SIDs.Max();
+            }
+            else
+            {
+                lastSID = 0;
+            }
+            
             // Add students------------------------------------------------------------
             for (int i = 0; i < numberOfStudents; i++)
             {
@@ -553,13 +600,24 @@ namespace DBPopulator
                     FirstName = firstName,
                     LastName = lastName,
                     Email = email,
-                    StudentID = i + 1,
+                    StudentID = ++lastSID,
                     Address = rng.Next(5000) + " " + streetPreDirection + " " + (rng.Next(500) * 10) + " " + streetPostDirection,
                     Zip = ziplist[rng.Next(0,ziplist.Count)]
                 });
                 context.SaveChanges();
             }
             
+            var IntIDs = context.Instructors.Select(x => x.InstructorID);
+            List<int> IIDs = IntIDs.ToList();
+            int lastIID;
+            if(IIDs.Count > 0)
+            {
+                lastIID = IIDs.Max();
+            }
+            else
+            {
+                lastIID = 0;
+            }
             // Add 20 instructors------------------------------------------------------------
             for (int i = 0; i < numberofInstructors; i++)
             {
@@ -612,7 +670,7 @@ namespace DBPopulator
                     FirstName = firstName,
                     LastName = lastName,
                     Email = email,
-                    InstructorID = i + 1,
+                    InstructorID = ++lastIID,
                     Address = rng.Next(5000) + " " + streetPreDirection + " " + (rng.Next(500) * 10) + " " + streetPostDirection,
                     Zip = ziplist[rng.Next(0,ziplist.Count)]
                 });
@@ -718,8 +776,11 @@ namespace DBPopulator
             var queryCourses = context.Courses.Select(x => x.CourseID);
             List<string> queryCourseList = queryCourses.ToList();
 
+            var usedCourses = context.Sections.Select(x => x.CourseID);
+            List<string> usedCourse = usedCourses.ToList();
+
             //add sections for each course
-            foreach (string Course_No in queryCourseList)
+            foreach (string Course_No in queryCourseList.Except(usedCourse))
             {
                 //add a number of sections between 1 and 3
                 for (int i = 0; i < rng.Next(1, 4); ++i)
@@ -809,8 +870,10 @@ namespace DBPopulator
             var possibleStudents = context.Students.Select(x => x.StudentID);
             List<int> possibleStudentIDs = possibleStudents.ToList();
             
+            var enrolledSections = context.Enrollments.Select(x => x.SectionID);
+            List<int> enrolledSect = enrolledSections.ToList();
             //for each section add between 15,25 students
-            foreach (int SectID in querySectionList)
+            foreach (int SectID in querySectionList.Except(enrolledSect))
             {
                 List<int> usedIDs = new List<int>();
                 //if there are no more possible students, go to next section
@@ -857,43 +920,8 @@ namespace DBPopulator
                 }
             }
 
-            //ADD BASIC ASSIGNMENT TYPES------------------------------------------------------------
-            int id = 0;
-            context.AssignmentTypes.Add(new AssignmentType()
-            {
-                AssignmentTypeID = ++id,
-                Description = "Exams"
-            });
-            context.AssignmentTypes.Add(new AssignmentType()
-            {
-                AssignmentTypeID = ++id,
-                Description = "Assignments"
-            });
-            context.AssignmentTypes.Add(new AssignmentType()
-            {
-                AssignmentTypeID = ++id,
-                Description = "Quizzes"
-            });
-            context.AssignmentTypes.Add(new AssignmentType()
-            {
-                AssignmentTypeID = ++id,
-                Description = "Discussions"
-            });
-            context.AssignmentTypes.Add(new AssignmentType()
-            {
-                AssignmentTypeID = ++id,
-                Description = "Misc"
-            });
-            context.AssignmentTypes.Add(new AssignmentType()
-            {
-                AssignmentTypeID = ++id,
-                Description = "Extra Credit"
-            });
-
-            context.SaveChanges();
-
             //ADD GRADE TYPE WEIGHTS FOR EACH SECTION------------------------------------------------------------
-            foreach (int SectID in querySectionList)
+            foreach (int SectID in querySectionList.Except(enrolledSect))
             {
                 //calculate weight percentages for assignment types such that they add up to 100%
                 int total = 10;
@@ -961,7 +989,7 @@ namespace DBPopulator
             }
 
             //ADD LETTER GRADE SCALE FOR EACH SECTION------------------------------------------------------------
-            foreach (int SectID in querySectionList)
+            foreach (int SectID in querySectionList.Except(enrolledSect))
             {
                 //lsit of letter grades
                 List<string> Letters = new List<string>()
@@ -1068,6 +1096,7 @@ namespace DBPopulator
             //    section.InstructorID = section.Instructor.InstructorID;
             //    section.Instructor.Sections.Add(section);
             //}
+            
             /*
             // Add random assignments to sections
             for(int i = 0; i < context.Sections.Count() * 7; i++)
@@ -1120,7 +1149,8 @@ namespace DBPopulator
 
             }
             
-            context.SaveChanges();*/
+            context.SaveChanges();
+            */
             
         } 
         // Bell curves courtesy of https://stackoverflow.com/questions/5816985/random-number-generator-which-gravitates-numbers-to-any-given-number-in-range

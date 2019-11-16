@@ -1117,7 +1117,7 @@ namespace DBPopulator
                     var assignID = DetailList.ElementAt(rng.Next(context.AssignmentDetails.Count())).AssignmentID;
                     var secAssignment = new SectionAssignment()
                     {
-                        AssignmentID = assignID,
+                        AssignmentId = assignID,
                         DueDate = dueDate,
                         OpenDate = dueDate.AddDays(-7 * rng.Next(0, 2)),
                         SectionId = section.SectionID,
@@ -1132,75 +1132,33 @@ namespace DBPopulator
             context.SaveChanges();
 
             //TODO:  Add assignmentgrades
-
-
-
-
-
-            // Commented out:  this may have already been done
-            //// Add instructor details to sections
-            //foreach(var section in context.Sections)
-            //{
-            //    section.Instructor = context.Instructors.Where(a => a.Sections.Count < 4).ElementAt(rng.Next(context.Instructors.Where(a => a.Sections.Count < 4).Count()));
-            //    section.InstructorID = section.Instructor.InstructorID;
-            //    section.Instructor.Sections.Add(section);
-            //}
-            
-            /*
-            // Add random assignments to sections
-            for(int i = 0; i < context.Sections.Count() * 7; i++)
-            {
-                var relevantSection = context.Sections.Where(a => a.AssignmentDetails.Count < 10).ElementAt(rng.Next(context.Sections.Where(a => a.AssignmentDetails.Count < 10).Count()));
-                var assignmentType = context.AssignmentTypes.ElementAt(rng.Next(context.AssignmentTypes.Count()));
-                var assignmentTypeID = assignmentType.AssignmentTypeID;
-                int daysDiff = ((TimeSpan)(relevantSection.EndDate - relevantSection.BeginDate)).Days;
-                var dueDate = relevantSection.BeginDate.AddDays(rng.Next(daysDiff));
-                var enrollmentsInSection = context.Enrollments.Where(a => a.SectionID == relevantSection.SectionID);
-
-                relevantSection.AssignmentDetails.Add(new AssignmentDetail()
-                {
-                    AssignmentID = context.AssignmentDetails.LastOrDefault() == null ? 1 : context.AssignmentDetails.Last().AssignmentID + 1,
-                    AssignmentTypeID = assignmentTypeID,
-                    AssignmentType = assignmentType,
-                    DueDate = dueDate,
-                    OpenDate = dueDate.AddDays(-7),
-                    PointValue = rng.Next(0, 101),
-                    // TODO:  Add assignment grades
-                });
-                context.AssignmentDetails.Add(relevantSection.AssignmentDetails.Last());
-                context.AssignmentDetails.Last().Sections.Add(relevantSection);
-            }
-            
             // Add grades for assignments
-            foreach(var assignment in context.AssignmentDetails.Where(a => a.DueDate < DateTime.Today))
+            
+            foreach(var sectionAssignment in context.SectionAssignments)
             {
-                foreach(var section in assignment.Sections)
+                
+                var enrollmentsInSection = context.Enrollments.Where(a => a.SectionID == sectionAssignment.SectionId);
+                var studentsEnrolled = context.Students.Where(a => enrollmentsInSection.Select(b => b.StudentID).Contains(a.StudentID));
+                foreach(var student in studentsEnrolled)
                 {
-                    var enrollmentsInSection = context.Enrollments.Where(a => a.SectionID == section.SectionID);
-                    var studentsEnrolled = context.Students.Where(a => enrollmentsInSection.Select(b => b.StudentID).Contains(a.StudentID));
-                    foreach(var student in studentsEnrolled)
+                    
+                    var timeSpan = ((TimeSpan)(sectionAssignment.DueDate - sectionAssignment.OpenDate)).Days;
+                    var subDate = ((DateTime)sectionAssignment.OpenDate).AddDays(InverseBellCurve(rng) * timeSpan);
+                      
+                    context.AssignmentGrades.Add(new AssignmentGrade()
                     {
-                        var timeSpan = (assignment.DueDate - assignment.OpenDate).Days;
-                        var subDate = assignment.OpenDate.AddDays(InverseBellCurve(rng) * timeSpan);
-                        
-                        assignment.AssignmentGrades.Add(new AssignmentGrade()
-                        {
-                            StudentID = student.StudentID,
-                            AssignmentDetail = assignment,
-                            AssignmentID = assignment.AssignmentID,
-                            Grade = InverseBellCurve(rng) * 100,
-                            SubmissionNum = 1,
-                            SubmissionDate = subDate
+                        StudentId = student.StudentID,
+                        SectionAssignmentId = sectionAssignment.SectionAssignmentId,
+                        Grade = InverseBellCurve(rng) * 100,
+                        SubmissionNum = 1,
+                        SubmissionDate = subDate
                             
-                        });
-                    }
+                    });
                 }
 
             }
             
-            context.SaveChanges();
-            */
-            
+            context.SaveChanges();         
         } 
         // Bell curves courtesy of https://stackoverflow.com/questions/5816985/random-number-generator-which-gravitates-numbers-to-any-given-number-in-range
             /// <summary>
@@ -1219,7 +1177,7 @@ namespace DBPopulator
             /// <returns>the random number</returns>
             public static double BellCurve(Random rnd)
             {
-                return Math.Pow(2 * rnd.NextDouble() - 1, 2);
+                return Math.Pow(rnd.NextDouble(), 8);
             }
     }
 }
